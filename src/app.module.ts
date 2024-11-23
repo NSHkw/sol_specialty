@@ -11,9 +11,29 @@ import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
+import { ConfigModule } from '@nestjs/config';
+import { configModuleValidationJoiSchema } from './configs/env-validation.config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeormModuleOptions } from './configs/database.config';
 
 @Module({
-  imports: [UserModule, AuthModule, StoreModule, StoreProductModule, LocalSpecialtyModule, CartItemModule, OrderModule, OrderItemModule, ProductModule, ReviewModule],
+  imports: [
+    UserModule,
+    AuthModule,
+    StoreModule,
+    StoreProductModule,
+    LocalSpecialtyModule,
+    CartItemModule,
+    OrderModule,
+    OrderItemModule,
+    ProductModule,
+    ReviewModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+      validationSchema: configModuleValidationJoiSchema,
+    }),
+    TypeOrmModule.forRootAsync(typeormModuleOptions),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
