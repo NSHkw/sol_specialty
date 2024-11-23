@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { StoreProductService } from './store-product.service';
 import { CreateStoreProductDto } from './dto/create-store-product.dto';
 import { UpdateStoreProductDto } from './dto/update-store-product.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('StoreProduct')
 @Controller('store-product')
 export class StoreProductController {
   constructor(private readonly storeProductService: StoreProductService) {}
