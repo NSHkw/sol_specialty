@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { LocalSpecialtyService } from './local-specialty.service';
 import { CreateLocalSpecialtyDto } from './dto/create-local-specialty.dto';
 import { UpdateLocalSpecialtyDto } from './dto/update-local-specialty.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Specialty')
 @Controller('local-specialty')
 export class LocalSpecialtyController {
   constructor(private readonly localSpecialtyService: LocalSpecialtyService) {}

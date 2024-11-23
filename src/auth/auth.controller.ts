@@ -5,7 +5,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 
-@ApiTags('인증')
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
