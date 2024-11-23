@@ -1,36 +1,41 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { UserService } from 'src/user/user.service';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { SignUpDto } from './dto/sign-up.dto';
+import { SignInDto } from './dto/sign-in.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) {}
 
-  @Post()
-  create(@Body() createAuthDto: CreateAuthDto) {
-    return this.authService.create(createAuthDto);
+  /**
+   * 회원가입
+   * @param signUpDto
+   * @returns
+   */
+  @HttpCode(HttpStatus.CREATED)
+  @Post('/sign-up')
+  async signUp(@Body() signUpDto: SignUpDto) {
+    const data = await this.authService.signUp(signUpDto);
+
+    return { statusCode: HttpStatus.CREATED, message: '회원가입 성공', data };
   }
 
-  @Get()
-  findAll() {
-    return this.authService.findAll();
-  }
+  /**
+   * 로그인
+   * @param signInDto
+   * @returns
+   */
+  @HttpCode(HttpStatus.OK)
+  @Post('/sign-in')
+  async signIn(@Body() signInDto: SignInDto) {
+    const data = await this.authService.signIn(signInDto);
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.authService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-    return this.authService.update(+id, updateAuthDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.authService.remove(+id);
+    return { statusCode: HttpStatus.OK, message: '로그인 성공', data };
   }
 }
