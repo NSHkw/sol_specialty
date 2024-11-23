@@ -1,4 +1,3 @@
-// src/user/entities/user.entity.ts
 import { CartItem } from 'src/cart-item/entities/cart-item.entity';
 import { Order } from 'src/order/entities/order.entity';
 import { Review } from 'src/review/entities/review.entity';
@@ -19,6 +18,7 @@ export enum UserRole {
   SELLER = 'SELLER',
   ADMIN = 'ADMIN',
 }
+
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
