@@ -1,4 +1,3 @@
-// src/order/entities/order.entity.ts
 import { OrderItem } from 'src/order-item/entities/order-item.entity';
 import { User } from 'src/user/entities/user.entity';
 import {

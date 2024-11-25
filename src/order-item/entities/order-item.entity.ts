@@ -1,5 +1,3 @@
-// src/order/entities/order-item.entity.ts
-
 import { Order } from 'src/order/entities/order.entity';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import {
