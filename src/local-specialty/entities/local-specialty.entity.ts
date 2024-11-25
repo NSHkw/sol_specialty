@@ -40,5 +40,5 @@ export class LocalSpecialty {
   deleted_at: Date;
 
   @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.local_specialty)
-  storeProducts: StoreProduct[];
+  store_products: StoreProduct[];
 }

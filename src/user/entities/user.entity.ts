@@ -64,5 +64,5 @@ export class User {
   orders: Order[];
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.user)
-  cartItems: CartItem[];
+  cart_items: CartItem[];
 }

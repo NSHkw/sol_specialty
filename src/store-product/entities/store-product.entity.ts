@@ -47,17 +47,17 @@ export class StoreProduct {
   @Column()
   image: string;
 
-  @ManyToOne(() => Store, (store) => store.storeProducts)
+  @ManyToOne(() => Store, (store) => store.store_products)
   @JoinColumn({ name: 'store_id' })
   store: Store;
 
-  @ManyToOne(() => LocalSpecialty, (localSpecialty) => localSpecialty.storeProducts)
+  @ManyToOne(() => LocalSpecialty, (localSpecialty) => localSpecialty.store_products)
   @JoinColumn({ name: 'local_specialty_id' })
   local_specialty: LocalSpecialty;
 
-  @OneToMany(() => CartItem, (cartItem) => cartItem.storeProduct)
-  cartItems: CartItem[];
+  @OneToMany(() => CartItem, (cartItem) => cartItem.store_product)
+  cart_items: CartItem[];
 
-  @OneToMany(() => OrderItem, (orderItem) => orderItem.storeProduct)
-  orderItems: OrderItem[];
+  @OneToMany(() => OrderItem, (orderItem) => orderItem.store_product)
+  order_items: OrderItem[];
 }

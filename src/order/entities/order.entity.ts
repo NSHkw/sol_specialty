@@ -52,5 +52,5 @@ export class Order {
   user: User;
 
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order)
-  orderItem: OrderItem[];
+  order_items: OrderItem[];
 }
