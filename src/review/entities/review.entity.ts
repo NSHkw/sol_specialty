@@ -1,4 +1,3 @@
-// src/review/entities/review.entity.ts
 import { Store } from 'src/store/entities/store.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -26,7 +25,7 @@ export class Review {
   @Column()
   rating: number;
 
-  @Column()
+  @Column({ type: 'text' })
   content: string;
 
   @CreateDateColumn()
@@ -38,11 +37,11 @@ export class Review {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  @ManyToOne(() => User, (user) => user.review)
+  @ManyToOne(() => User, (user) => user.reviews)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => Store, (store) => store.review)
+  @ManyToOne(() => Store, (store) => store.reviews)
   @JoinColumn({ name: 'store_id' })
   store: Store;
 }
