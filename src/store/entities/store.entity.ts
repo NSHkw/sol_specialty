@@ -39,7 +39,7 @@ export class Store {
   @Column({ default: 0 })
   review_count: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'decimal', precision: 2, scale: 1, default: 0 })
   rating: number;
 
   @Column()

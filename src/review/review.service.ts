@@ -1,4 +1,10 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { User } from 'src/user/entities/user.entity';
@@ -16,6 +22,7 @@ export class ReviewService {
     private readonly storeRepository: Repository<Store>,
   ) {}
 
+  // 리뷰 평균 점수 업데이트
   private async updateStoreRating(store_id: number) {
     const reviews = await this.reviewRepository.find({
       where: { store_id, deleted_at: null },
@@ -31,25 +38,30 @@ export class ReviewService {
   }
 
   async create(user: User, createReviewDto: CreateReviewDto) {
+    // 로그인 예외 처리
+    if (!user) {
+      throw new UnauthorizedException('로그인 먼저');
+    }
+
     const { store_id, rating, content } = createReviewDto;
 
+    // 상점 존재 예외처리
     const existingStore = await this.storeRepository.findOne({
       where: { id: store_id, deleted_at: null },
     });
-
     if (!existingStore) {
       throw new NotFoundException('존재하지 않는 상점');
     }
 
+    // 리뷰 존재 예외처리
     const existingReview = await this.reviewRepository.findOne({
       where: { user_id: user.id, store_id, deleted_at: null },
     });
-
-    if (!existingReview) {
+    if (existingReview) {
       throw new ConflictException('이미 상점에 대한 리뷰를 적었다');
     }
 
-    const review = this.reviewRepository.save({
+    const review = await this.reviewRepository.save({
       user_id: user.id,
       store_id,
       rating,
@@ -59,5 +71,118 @@ export class ReviewService {
     await this.updateStoreRating(store_id);
 
     return { message: '리뷰가 등록되었다', review };
+  }
+
+  async delete(user: User, store_id: number) {
+    // 로그인 예외 처리
+    if (!user) {
+      throw new UnauthorizedException('로그인 먼저');
+    }
+
+    // 상점 존재 예외처리
+    const store = await this.storeRepository.findOne({
+      where: { id: store_id, deleted_at: null },
+    });
+
+    if (!store) {
+      throw new NotFoundException('존재하지 않는 상점');
+    }
+
+    // 리뷰 존재 예외처리
+    const existingReview = await this.reviewRepository.findOne({
+      where: { user_id: user.id, store_id, deleted_at: null },
+    });
+    if (!existingReview) {
+      throw new NotFoundException('이 상점에 대해 리뷰 안적음');
+    }
+
+    // 리뷰 권한 예외처리
+    if (existingReview.user_id !== user.id) {
+      throw new ForbiddenException('이 리뷰에 대한 권한 없음');
+    }
+
+    await this.reviewRepository.softDelete(existingReview.id);
+
+    await this.updateStoreRating(store_id);
+
+    return {
+      message: '리뷰가 삭제되었다',
+      삭제한_리뷰: {
+        store_id,
+        content: existingReview.content,
+        rating: existingReview.rating,
+      },
+    };
+  }
+
+  async getReviews(store_id: number) {
+    const store = await this.storeRepository.findOne({
+      where: { id: store_id, deleted_at: null },
+    });
+
+    if (!store) {
+      throw new NotFoundException('존재하지 않는 상점');
+    }
+
+    const reviews = await this.reviewRepository.find({
+      where: { store_id, deleted_at: null },
+      relations: ['user'],
+      select: {
+        id: true,
+        content: true,
+        rating: true,
+        user: { id: true, nickname: true },
+      },
+    });
+
+    return {
+      상점_이름: store.name,
+      총_리뷰_개수: reviews.length,
+      평균_리뷰_점수: store.rating,
+      reviews,
+    };
+  }
+
+  async updateReview(user: User, store_id: number, updateReviewDto: UpdateReviewDto) {
+    // 로그인 예외 처리
+    if (!user) {
+      throw new UnauthorizedException('로그인 먼저');
+    }
+
+    // 상점 존재 예외처리
+    const store = await this.storeRepository.findOne({
+      where: { id: store_id, deleted_at: null },
+    });
+    if (!store) {
+      throw new NotFoundException('존재하지 않는 상점');
+    }
+
+    // 리뷰 존재 예외처리
+    const existingReview = await this.reviewRepository.findOne({
+      where: { user_id: user.id, store_id, deleted_at: null },
+    });
+    if (!existingReview) {
+      throw new NotFoundException('이 상점에 대해 리뷰 안 적음');
+    }
+    // 리뷰 권한 예외처리
+    if (existingReview.user_id !== user.id) {
+      throw new ForbiddenException('이 리뷰에 대한 권한 없음');
+    }
+
+    await this.reviewRepository.update(existingReview.id, {
+      content: updateReviewDto.content,
+      rating: updateReviewDto.rating,
+    });
+
+    await this.updateStoreRating(store_id);
+
+    return {
+      message: '리뷰 수정',
+      수정한_리뷰: {
+        store_id,
+        content: updateReviewDto.content,
+        rating: updateReviewDto.rating,
+      },
+    };
   }
 }
