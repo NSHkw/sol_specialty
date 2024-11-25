@@ -1,4 +1,3 @@
-// src/local-specialty/local-specialty.controller.ts
 import {
   Body,
   Controller,
@@ -56,7 +55,7 @@ export class LocalSpecialtyController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   delete(@GetUser() user: User, @Param('id') id: number) {
     return this.localSpecialtyService.delete(user, id);
   }
@@ -100,10 +99,22 @@ export class LocalSpecialtyController {
     return this.localSpecialtyService.findByRegion(region);
   }
 
+  /**
+   * 특산품 id로 조회
+   * @param id 특산품 id
+   * @returns 특산품 id로 조회 결과
+   */
   @Get(':id')
   findById(@Param('id') id: number) {
     return this.localSpecialtyService.findById(id);
   }
+
+  // storeProducts를 포함한 전체 조회 엔드포인트 추가 (필요한 경우)
+  // @Get('with-store-products')
+  // @HttpCode(HttpStatus.OK)
+  // findAllWithStoreProducts() {
+  //   return this.localSpecialtyService.findAllWithStoreProducts();
+  // }
 
   /**
    * 특산품 검색
