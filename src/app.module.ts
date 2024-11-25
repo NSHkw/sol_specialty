@@ -9,7 +9,6 @@ import { LocalSpecialtyModule } from './local-specialty/local-specialty.module';
 import { CartItemModule } from './cart-item/cart-item.module';
 import { OrderModule } from './order/order.module';
 import { OrderItemModule } from './order-item/order-item.module';
-import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
 import { ConfigModule } from '@nestjs/config';
 import { configModuleValidationJoiSchema } from './configs/env-validation.config';
@@ -26,7 +25,6 @@ import { typeormModuleOptions } from './configs/database.config';
     CartItemModule,
     OrderModule,
     OrderItemModule,
-    ProductModule,
     ReviewModule,
     ConfigModule.forRoot({
       isGlobal: true,

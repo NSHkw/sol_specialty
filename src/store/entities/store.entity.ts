@@ -1,4 +1,3 @@
-// src/store/entities/store.entity.ts
 import { Review } from 'src/review/entities/review.entity';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -66,8 +65,8 @@ export class Store {
   user: User;
 
   @OneToMany(() => Review, (review) => review.store)
-  review: Review[];
+  reviews: Review[];
 
   @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.store)
-  storeProduct: StoreProduct[];
+  storeProducts: StoreProduct[];
 }

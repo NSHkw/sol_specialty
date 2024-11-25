@@ -58,11 +58,11 @@ export class User {
   store: Store;
 
   @OneToMany(() => Review, (review) => review.user)
-  review: Review[];
+  reviews: Review[];
 
   @OneToMany(() => Order, (order) => order.user)
-  order: Order[];
+  orders: Order[];
 
   @OneToMany(() => CartItem, (cartItem) => cartItem.user)
-  cartItem: CartItem[];
+  cartItems: CartItem[];
 }
