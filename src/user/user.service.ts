@@ -18,6 +18,8 @@ export class UserService {
     private readonly jwtService: JwtService,
   ) {}
 
+  // 모든 유저 조회, 로그인 한 유저 프로필 조회, 프로필 수정, 비밀번호 수정, 권한 수정, cash 충전, 회원 탈퇴
+
   // 관리자가 모든 유저 조회
   async findAll() {
     return await this.userRepository.find();
