@@ -28,6 +28,9 @@ export class LocalSpecialty {
   @Column({ type: 'varchar', enum: Region }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
   region: Region;
 
+  @Column()
+  image_url: string;
+
   @CreateDateColumn()
   created_at: Date;
 
