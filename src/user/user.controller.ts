@@ -1,4 +1,13 @@
-import { Controller, Get, Body, Patch, UseGuards, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Body,
+  Patch,
+  UseGuards,
+  Delete,
+  HttpStatus,
+  HttpCode,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -18,6 +27,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   // 모든 유저 조회, 로그인 한 유저 프로필 조회, 프로필 수정, 비밀번호 수정, 권한 수정, cash 충전, 회원 탈퇴
+
   /**
    * 관리자가 모든 유저 조회
    * @returns 모든 유저 정보
@@ -46,6 +56,7 @@ export class UserController {
    */
   @Patch('profile')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   updateUserProfile(@GetUser() user: User, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateProfile(user, updateUserDto);
   }
@@ -57,6 +68,7 @@ export class UserController {
    */
   @Patch('password')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   async updateUserPassword(@GetUser() user: User, @Body() updatePasswordDto: UpdatePasswordDto) {
     return this.userService.updatePassword(user, updatePasswordDto);
   }
@@ -69,6 +81,7 @@ export class UserController {
   @Patch('role')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
   async updateRole(@Body() updateRoleDto: UpdateRoleDto) {
     return this.userService.updateRole(updateRoleDto);
   }
@@ -81,6 +94,7 @@ export class UserController {
    */
   @Patch('cash')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   async updateUserCash(@GetUser() user: User, @Body('amount') amount: number) {
     return this.userService.updateUserCash(user, amount);
   }
@@ -92,6 +106,7 @@ export class UserController {
    */
   @Delete('withdraw')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.OK)
   async withdraw(@GetUser() user: User, @Body() withdrawDto: WithdrawDto) {
     return this.userService.withdraw(user, withdrawDto);
   }
