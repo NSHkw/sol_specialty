@@ -1,5 +1,4 @@
 import { HttpCode, HttpStatus, Query } from '@nestjs/common';
-// src/store/store.controller.ts
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';

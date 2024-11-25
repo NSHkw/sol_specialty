@@ -1,4 +1,3 @@
-// src/auth/dto/sign-up.dto.ts
 import { PickType } from '@nestjs/mapped-types';
 import {
   IsEmail,

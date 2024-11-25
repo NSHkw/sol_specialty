@@ -1,4 +1,3 @@
-// src/configs/env-validation.config.ts
 import Joi from 'joi';
 
 export const configModuleValidationJoiSchema = Joi.object({
