@@ -1,5 +1,3 @@
-// src/local-specialty/entities/local-specialty.entity.ts
-import { Product } from 'src/product/entities/product.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,6 +8,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Region } from '../types/region.type';
+import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 
 @Entity()
 export class LocalSpecialty {
@@ -40,6 +39,6 @@ export class LocalSpecialty {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  @OneToMany(() => Product, (product) => product.localSpecialty)
-  product: Product[];
+  @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.local_specialty)
+  store_products: StoreProduct[];
 }

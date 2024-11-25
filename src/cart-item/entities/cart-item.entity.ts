@@ -17,11 +17,11 @@ export class CartItem {
   @Column()
   quantity: number;
 
-  @ManyToOne(() => User, (user) => user.cartItem)
+  @ManyToOne(() => User, (user) => user.cart_items)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => StoreProduct, (storeProduct) => storeProduct.cartItem)
+  @ManyToOne(() => StoreProduct, (storeProduct) => storeProduct.cart_items)
   @JoinColumn({ name: 'store_product_id' })
-  storeProduct: StoreProduct;
+  store_product: StoreProduct;
 }

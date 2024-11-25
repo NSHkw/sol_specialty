@@ -1,4 +1,3 @@
-// src/store/entities/store.entity.ts
 import { Review } from 'src/review/entities/review.entity';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -29,13 +28,13 @@ export class Store {
   description: string;
 
   @Column()
-  address: string;
+  address?: string;
 
   @Column()
-  contact: string;
+  contact?: string;
 
   @Column()
-  image: string;
+  image?: string;
 
   @Column({ default: 0 })
   review_count: number;
@@ -44,10 +43,10 @@ export class Store {
   rating: number;
 
   @Column()
-  longitude: number;
+  longitude?: number;
 
   @Column()
-  latitude: number;
+  latitude?: number;
 
   @Column({ default: 0 })
   total_sales: number;
@@ -66,8 +65,8 @@ export class Store {
   user: User;
 
   @OneToMany(() => Review, (review) => review.store)
-  review: Review[];
+  reviews: Review[];
 
   @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.store)
-  storeProduct: StoreProduct[];
+  store_products: StoreProduct[];
 }
