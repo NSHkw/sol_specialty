@@ -6,7 +6,6 @@ import { LocalSpecialty } from './entities/local-specialty.entity';
 import { PassportModule } from '@nestjs/passport';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
-import { ProductModule } from 'src/product/product.module';
 
 @Module({
   imports: [
@@ -14,7 +13,6 @@ import { ProductModule } from 'src/product/product.module';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     AuthModule,
     UserModule,
-    forwardRef(() => ProductModule),
   ],
   controllers: [LocalSpecialtyController],
   providers: [LocalSpecialtyService],

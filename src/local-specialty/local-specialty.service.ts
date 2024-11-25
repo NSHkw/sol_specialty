@@ -1,4 +1,3 @@
-// src/local-specialty/local-specialty.service.ts
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { LocalSpecialty } from './entities/local-specialty.entity';
 import { IsNull, Like, Repository } from 'typeorm';
@@ -25,7 +24,7 @@ export class LocalSpecialtyService {
    */
   async create(user: User, createDto: CreateLocalSpecialtyDto) {
     const { name } = createDto;
-    const existedSpecialty = this.localSpecialtyRepository.findOne({
+    const existedSpecialty = await this.localSpecialtyRepository.findOne({
       where: { name },
     });
 
@@ -74,9 +73,9 @@ export class LocalSpecialtyService {
       throw new NotFoundException('특산품 찾지 못함');
     }
 
-    await this.localSpecialtyRepository.update(id, updateDto);
+    const updatedSpecialty = this.localSpecialtyRepository.create(updateDto);
 
-    return { message: '수정 완료' };
+    return { message: '수정 완료', updatedSpecialty };
   }
 
   /**
@@ -100,6 +99,9 @@ export class LocalSpecialtyService {
   async findByRegion(region: Region): Promise<LocalSpecialty[]> {
     return this.localSpecialtyRepository.find({
       where: { region, deleted_at: IsNull() },
+      relations: {
+        storeProducts: true,
+      },
     });
   }
 
@@ -119,6 +121,9 @@ export class LocalSpecialtyService {
         region: true,
         created_at: true,
       },
+      relations: {
+        storeProducts: true,
+      },
     });
 
     if (!specialty) {
@@ -127,6 +132,16 @@ export class LocalSpecialtyService {
 
     return specialty;
   }
+
+  // 필요한 경우 storeProducts 포함하여 조회하는 메서드 추가
+  // async findAllWithStoreProducts(): Promise<LocalSpecialty[]> {
+  //   return this.localSpecialtyRepository.find({
+  //     where: {
+  //       deleted_at: IsNull(),
+  //     },
+  //     relations: ['storeProducts'],
+  //   });
+  // }
 
   /**
    * 특산품 검색
