@@ -1,6 +1,6 @@
 import { CartItem } from 'src/cart-item/entities/cart-item.entity';
 import { LocalSpecialty } from 'src/local-specialty/entities/local-specialty.entity';
-import { OrderItem } from 'src/order-item/entities/order-item.entity';
+import { OrderItem } from 'src/order/entities/order-item.entity';
 import { Store } from 'src/store/entities/store.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
