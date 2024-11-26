@@ -18,7 +18,7 @@ export class Store {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unsigned: true })
+  @Column({ unsigned: true, unique: true })
   user_id: number;
 
   @Column()
@@ -60,7 +60,7 @@ export class Store {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  @OneToOne(() => User, (user) => user.store)
+  @OneToOne(() => User, (user) => user.store, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'user_id' })
   user: User;
 

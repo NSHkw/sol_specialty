@@ -22,6 +22,15 @@ export class StoreService {
   // 상점 생성
   async createStore(user: User, createStoreDto: CreateStoreDto) {
     const { name } = createStoreDto;
+
+    const existingUserStore = await this.storeRepository.findOne({
+      where: { user_id: user.id, deleted_at: null },
+    });
+
+    if (existingUserStore) {
+      throw new ConflictException('이미 상점을 보유하고 있는 사용자입니다.');
+    }
+
     const existedStore = await this.storeRepository.findOne({
       where: { name, deleted_at: null },
     });
