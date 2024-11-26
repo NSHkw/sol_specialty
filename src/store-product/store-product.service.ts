@@ -67,7 +67,7 @@ export class StoreProductService {
     const newStoreProduct = this.storeProductRepository.save({
       ...createStoreProductDto,
       store_id,
-      is_active: stock > 0 ? true : false,
+      sold_out: stock > 0 ? false : true,
     });
 
     return newStoreProduct;
@@ -80,7 +80,7 @@ export class StoreProductService {
    */
   async findAll(store_id: number) {
     return await this.storeProductRepository.find({
-      where: { store_id },
+      where: { store_id, is_active: true },
       relations: ['local_specialty'],
       select: {
         id: true,
@@ -88,7 +88,6 @@ export class StoreProductService {
         price: true,
         grade: true,
         type: true,
-        is_active: true,
         local_specialty: { id: true, name: true },
       },
     });
@@ -139,11 +138,15 @@ export class StoreProductService {
       throw new NotFoundException('상품 존재 X');
     }
 
-    if (stock !== undefined) {
-      updateStoreProductDto.is_active = stock > 0 ? true : false;
-    }
+    await this.storeProductRepository.update(
+      { id: product_id },
+      {
+        ...updateStoreProductDto,
+        sold_out: stock !== undefined ? (stock > 0 ? false : true) : product.sold_out,
+      },
+    );
 
-    await this.storeProductRepository.update(product_id, updateStoreProductDto);
+    return { message: '상품 수정 완료', product_name: product.product_name };
   }
 
   /**

@@ -36,8 +36,4 @@ export class CreateStoreProductDto {
   @IsString()
   @IsOptional()
   image?: string;
-
-  @IsBoolean()
-  @IsOptional()
-  is_active?: boolean;
 }

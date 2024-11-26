@@ -46,6 +46,15 @@ export class StoreProduct {
   @Column({ default: false })
   is_active: boolean;
 
+  // 품절 여부
+  @Column({ default: false })
+  sold_out: boolean;
+
+  // is_active가 true, sold_out가 true인 경우 판매 중 (하지만 품절되었기에 더 팔수 없음)
+  // is_active가 true, sold_out가 false인 경우 판매 중 (정상 판매)
+  // is_active가 false, sold_out가 true인 경우 판매 중지 (단순히 품절되어서 팔수 없음)
+  // is_active가 false, sold_out가 false인 경우 판매 중지 (판매 중지 상태)
+
   // 이미지
   @Column()
   image?: string;
