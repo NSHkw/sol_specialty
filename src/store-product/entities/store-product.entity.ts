@@ -17,35 +17,38 @@ export class StoreProduct {
 
   // 상품명
   @Column()
-  product_Name: string;
+  product_name: string;
+
+  @Column({ type: 'text' })
+  description: string;
 
   // 프리미엄, 일반
-  @Column()
-  grade: string;
+  @Column({ default: '일반' })
+  grade?: string;
 
   // 세트, 낱개
-  @Column()
-  type: string;
+  @Column({ default: '낱개' })
+  type?: string;
 
   // 무게
-  @Column()
-  weight: number;
+  @Column({ default: 0 })
+  weight?: number;
 
   // 가격
   @Column()
   price: number;
 
   // 재고
-  @Column()
+  @Column({ default: 0 })
   stock: number;
 
   // 판매 여부
-  @Column()
+  @Column({ default: false })
   is_active: boolean;
 
   // 이미지
   @Column()
-  image: string;
+  image?: string;
 
   @ManyToOne(() => Store, (store) => store.store_products)
   @JoinColumn({ name: 'store_id' })
