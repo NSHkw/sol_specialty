@@ -1,4 +1,4 @@
-import { OrderItem } from 'src/order-item/entities/order-item.entity';
+import { OrderItem } from 'src/order/entities/order-item.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
@@ -46,7 +46,7 @@ export class Order {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => User, (user) => user.order)
+  @ManyToOne(() => User, (user) => user.orders)
   @JoinColumn({ name: 'user_id' })
   user: User;
 

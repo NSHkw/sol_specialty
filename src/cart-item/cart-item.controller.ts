@@ -1,36 +1,36 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CartItemService } from './cart-item.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
-import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User } from 'src/user/entities/user.entity';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 @ApiTags('CartItem')
 @Controller('cart-item')
 export class CartItemController {
   constructor(private readonly cartItemService: CartItemService) {}
 
+  // 장바구니 물품들 모두 주문하기, 장바구니에 물품 추가하기, 장바구니 모든 물품 조회하기, 장바구니 물품 삭제하기
+
+  // 장바구니 물품들 모두 주문하기
+
+  // 장바구니에 물품 추가하기
   @Post()
-  create(@Body() createCartItemDto: CreateCartItemDto) {
-    return this.cartItemService.create(createCartItemDto);
+  @UseGuards(JwtAuthGuard)
+  create(@GetUser() user: User, @Body() createCartItemDto: CreateCartItemDto) {
+    return this.cartItemService.create(user, createCartItemDto);
   }
 
+  // 장바구니 모든 물품 조회하기
   @Get()
-  findAll() {
-    return this.cartItemService.findAll();
+  findAll(@GetUser() user: User) {
+    return this.cartItemService.findAll(user);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.cartItemService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCartItemDto: UpdateCartItemDto) {
-    return this.cartItemService.update(+id, updateCartItemDto);
-  }
-
+  // 장바구니 물품 삭제하기
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.cartItemService.remove(+id);
+  remove(@GetUser() user: User, @Param('id') id: number) {
+    return this.cartItemService.remove(user, id);
   }
 }
