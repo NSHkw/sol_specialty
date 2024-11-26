@@ -54,7 +54,7 @@ export class User {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  @OneToOne(() => Store, (store) => store.user)
+  @OneToOne(() => Store, (store) => store.user, { onDelete: 'CASCADE' })
   store: Store;
 
   @OneToMany(() => Review, (review) => review.user)
