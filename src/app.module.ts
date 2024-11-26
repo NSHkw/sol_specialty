@@ -8,7 +8,6 @@ import { StoreProductModule } from './store-product/store-product.module';
 import { LocalSpecialtyModule } from './local-specialty/local-specialty.module';
 import { CartItemModule } from './cart-item/cart-item.module';
 import { OrderModule } from './order/order.module';
-import { OrderItemModule } from './order-item/order-item.module';
 import { ReviewModule } from './review/review.module';
 import { ConfigModule } from '@nestjs/config';
 import { configModuleValidationJoiSchema } from './configs/env-validation.config';
@@ -24,7 +23,6 @@ import { typeormModuleOptions } from './configs/database.config';
     LocalSpecialtyModule,
     CartItemModule,
     OrderModule,
-    OrderItemModule,
     ReviewModule,
     ConfigModule.forRoot({
       isGlobal: true,
