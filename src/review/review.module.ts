@@ -12,7 +12,7 @@ import { AuthModule } from 'src/auth/auth.module';
   imports: [
     TypeOrmModule.forFeature([Review, Store]),
     AuthModule,
-    UserModule,
+    forwardRef(() => UserModule),
     forwardRef(() => StoreModule),
   ],
   controllers: [ReviewController],
