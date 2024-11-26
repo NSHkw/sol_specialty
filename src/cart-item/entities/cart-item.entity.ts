@@ -1,4 +1,3 @@
-// src/cart-item/entities/cart-item.entity.ts
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
@@ -22,7 +21,6 @@ export class CartItem {
   user: User;
 
   @ManyToOne(() => StoreProduct, (storeProduct) => storeProduct.cart_items)
-
   @JoinColumn({ name: 'store_product_id' })
   store_product: StoreProduct;
 }
