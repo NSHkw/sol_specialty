@@ -7,7 +7,11 @@ import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([LocalSpecialty]), AuthModule, forwardRef(() => UserModule)],
+  imports: [
+    TypeOrmModule.forFeature([LocalSpecialty]),
+    forwardRef(() => AuthModule),
+    forwardRef(() => UserModule),
+  ],
   controllers: [LocalSpecialtyController],
   providers: [LocalSpecialtyService],
   exports: [LocalSpecialtyService],

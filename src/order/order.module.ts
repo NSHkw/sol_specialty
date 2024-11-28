@@ -9,11 +9,13 @@ import { AuthModule } from 'src/auth/auth.module';
 import { User } from 'src/user/entities/user.entity';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { CartItemModule } from 'src/cart-item/cart-item.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order, OrderItem, User, StoreProduct]),
     ScheduleModule.forRoot(),
+    forwardRef(() => CartItemModule),
     forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
   ],

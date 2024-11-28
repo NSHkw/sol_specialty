@@ -11,7 +11,7 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Review, Store]),
-    AuthModule,
+    forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
     forwardRef(() => StoreModule),
   ],

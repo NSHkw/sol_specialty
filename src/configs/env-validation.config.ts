@@ -11,6 +11,6 @@ export const configModuleValidationJoiSchema = Joi.object({
   PASSWORD_HASH_ROUND: Joi.number().required().default(10),
   JWT_SECRET: Joi.string().required(),
   JWT_EXPIRATION_TIME: Joi.string().required(),
-  ADMIN_SECRET_CODE: Joi.string().required(),
+  ADMIN_CODE: Joi.string().required(),
   NODE_ENV: Joi.string(),
 });

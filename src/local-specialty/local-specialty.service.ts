@@ -100,7 +100,7 @@ export class LocalSpecialtyService {
     return this.localSpecialtyRepository.find({
       where: { region, deleted_at: IsNull() },
       relations: {
-        storeProducts: true,
+        store_products: true,
       },
     });
   }
@@ -122,7 +122,7 @@ export class LocalSpecialtyService {
         created_at: true,
       },
       relations: {
-        storeProducts: true,
+        store_products: true,
       },
     });
 
