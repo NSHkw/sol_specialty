@@ -6,9 +6,17 @@ import { OrderItem } from './entities/order-item.entity';
 import { Order } from './entities/order.entity';
 import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { User } from 'src/user/entities/user.entity';
+import { StoreProduct } from 'src/store-product/entities/store-product.entity';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Order, OrderItem]), AuthModule, forwardRef(() => UserModule)],
+  imports: [
+    TypeOrmModule.forFeature([Order, OrderItem, User, StoreProduct]),
+    ScheduleModule.forRoot(),
+    forwardRef(() => AuthModule),
+    forwardRef(() => UserModule),
+  ],
   controllers: [OrderController],
   providers: [OrderService],
 })

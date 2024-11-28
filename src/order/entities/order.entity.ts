@@ -16,7 +16,16 @@ export enum ShipStatus {
   SHIPPING = '배송 중',
   SHIP_WAITING = '배송 대기',
   ORDER_COMPLETED = '주문 완료',
+  ORDER_CANCELLED = '주문 취소',
+  PAYMENT_WAITING = '결제 대기',
 }
+
+export enum OrderMethod {
+  DELIVERY = '일반 택배',
+  PICKUP = '직접 수령',
+  POST_OFFICE = '우체국 택배',
+}
+
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn()
@@ -25,16 +34,16 @@ export class Order {
   @Column()
   user_id: number;
 
-  @Column({ type: 'varchar', enum: ShipStatus }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
+  @Column({ type: 'varchar', enum: ShipStatus, default: ShipStatus.PAYMENT_WAITING }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
   status: ShipStatus;
 
   @Column()
   order_address: string;
 
-  @Column()
-  order_method: string;
+  @Column({ type: 'varchar', enum: OrderMethod }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
+  order_method: OrderMethod;
 
-  @Column()
+  @Column({ default: 0 })
   total_cash: number;
 
   @Column()
