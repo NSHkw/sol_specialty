@@ -6,15 +6,17 @@ import { CartItem } from './entities/cart-item.entity';
 import { UserModule } from 'src/user/user.module';
 import { StoreProductModule } from 'src/store-product/store-product.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([CartItem]),
-    AuthModule,
+    TypeOrmModule.forFeature([CartItem, StoreProduct]),
+    forwardRef(() => AuthModule),
     forwardRef(() => UserModule),
     forwardRef(() => StoreProductModule),
   ],
   controllers: [CartItemController],
   providers: [CartItemService],
+  exports: [CartItemService],
 })
 export class CartItemModule {}

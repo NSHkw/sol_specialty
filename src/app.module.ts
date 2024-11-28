@@ -13,6 +13,7 @@ import { ConfigModule } from '@nestjs/config';
 import { configModuleValidationJoiSchema } from './configs/env-validation.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeormModuleOptions } from './configs/database.config';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { typeormModuleOptions } from './configs/database.config';
       validationSchema: configModuleValidationJoiSchema,
     }),
     TypeOrmModule.forRootAsync(typeormModuleOptions),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],
