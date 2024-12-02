@@ -16,12 +16,11 @@ import {
 
 @Entity()
 @Index(['name', 'deleted_at'], { unique: true })
-@Index(['user_id', 'deleted_at'], { unique: true })
 export class Store {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column({ unsigned: true, type: 'int' })
+  @Column({ unsigned: true, unique: true, type: 'int' })
   user_id: number;
 
   @Column()

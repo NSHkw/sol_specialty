@@ -44,16 +44,11 @@ export class StoreService {
       throw new ConflictException('이미 존재하는 이름의 상점');
     }
 
-    // soft delete된 동일 이름의 상점이 있다면 hard delete 처리
-    await this.storeRepository
-      .createQueryBuilder()
-      .delete()
-      .from(Store)
-      .where('name = :name AND deleted_at IS NOT NULL', { name })
-      .execute();
-
     // 새로운 상점 생성
-    await this.storeRepository.save({ ...createStoreDto, user_id: user.id });
+    const newStore = await this.storeRepository.save({
+      ...createStoreDto,
+      user_id: user.id,
+    });
 
     const storeOwner = await this.userRepository.findOne({
       where: { id: user.id },
@@ -235,7 +230,6 @@ export class StoreService {
     try {
       const total = await query.getCount();
       const stores = await query
-        .orderBy('store.id', 'DESC')
         .take(limit)
         .skip((page - 1) * limit)
         .getMany();
