@@ -85,6 +85,8 @@ export class LocalSpecialtyService {
 
     const updatedSpecialty = this.localSpecialtyRepository.create(updateDto);
 
+    await this.localSpecialtyRepository.update(id, updatedSpecialty);
+
     return { message: '수정 완료', updatedSpecialty };
   }
 
