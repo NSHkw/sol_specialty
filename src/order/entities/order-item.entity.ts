@@ -11,13 +11,13 @@ import {
 
 @Entity()
 export class OrderItem {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   order_id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   store_product_id: number;
 
   @Column()

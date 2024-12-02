@@ -42,7 +42,7 @@ export class SignUpDto extends PickType(User, [
   address?: string;
 
   @IsOptional()
-  @IsPhoneNumber()
+  @IsPhoneNumber('KR')
   phone?: string;
 
   @IsNotEmpty({ message: '비밀번호 확인을 입력' })

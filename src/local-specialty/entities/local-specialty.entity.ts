@@ -12,13 +12,13 @@ import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 
 @Entity()
 export class LocalSpecialty {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   name: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   description: string;
 
   @Column()
@@ -27,17 +27,17 @@ export class LocalSpecialty {
   @Column({ type: 'varchar', enum: Region }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
   region: Region;
 
-  @Column()
-  image_url: string;
+  @Column({ nullable: true })
+  image?: string;
 
   @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @UpdateDateColumn({ nullable: true })
+  updated_at?: Date;
 
-  @DeleteDateColumn()
-  deleted_at: Date;
+  @DeleteDateColumn({ nullable: true })
+  deleted_at?: Date;
 
   @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.local_specialty)
   store_products: StoreProduct[];

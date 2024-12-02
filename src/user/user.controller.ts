@@ -19,6 +19,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
+import { UpdateCashDto } from './dto/update-cash.dto';
 
 @ApiTags('User')
 @ApiBearerAuth('access-token')
@@ -31,6 +32,7 @@ export class UserController {
   /**
    * 관리자가 모든 유저 조회
    * @returns 모든 유저 정보
+   * 관리자가 아닌 경우 오류 발생 하도록 (현재 오류상 forbidden resource)
    */
   @Get('all')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -46,7 +48,7 @@ export class UserController {
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   getUserProfile(@GetUser() user: User) {
-    return user;
+    return this.userService.getUserProfile(user);
   }
 
   /**
@@ -82,8 +84,8 @@ export class UserController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.OK)
-  async updateRole(@Body() updateRoleDto: UpdateRoleDto) {
-    return this.userService.updateRole(updateRoleDto);
+  async updateRole(@GetUser() adminUser: User, @Body() updateRoleDto: UpdateRoleDto) {
+    return this.userService.updateRole(adminUser, updateRoleDto);
   }
 
   /**
@@ -95,8 +97,8 @@ export class UserController {
   @Patch('cash')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.OK)
-  async updateUserCash(@GetUser() user: User, @Body('amount') amount: number) {
-    return this.userService.updateUserCash(user, amount);
+  async updateUserCash(@GetUser() user: User, @Body() updateCashDto: UpdateCashDto) {
+    return this.userService.updateUserCash(user, updateCashDto.amount);
   }
 
   /**

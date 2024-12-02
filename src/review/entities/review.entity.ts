@@ -14,13 +14,13 @@ import {
 
 @Entity()
 export class Review {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   store_id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   user_id: number;
 
   @Column({ type: 'decimal', precision: 2, scale: 1 })
@@ -34,11 +34,11 @@ export class Review {
   @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @UpdateDateColumn({ nullable: true })
+  updated_at?: Date;
 
-  @DeleteDateColumn()
-  deleted_at: Date;
+  @DeleteDateColumn({ nullable: true })
+  deleted_at?: Date;
 
   @ManyToOne(() => User, (user) => user.reviews, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })

@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -49,13 +49,19 @@ export class AuthService {
     const existedEmail = await this.userRepository.findOneBy({ email });
 
     if (existedEmail) {
-      throw new ConflictException('이미 존재하는 이메일');
+      throw new BadRequestException('이미 존재하는 이메일');
+    }
+
+    const existedNickname = await this.userRepository.findOne({ where: { nickname } });
+
+    if (existedNickname) {
+      throw new BadRequestException('이미 존재하는 닉네임');
     }
 
     let role = UserRole.CUSTOMER;
 
     if (adminCode) {
-      const envAdminCode = this.configService.get<string>('ADMIN_SECRET_CODE');
+      const envAdminCode = this.configService.get<string>('ADMIN_CODE');
 
       // 입력한 adminCode가 env에 있는 AdminCode와 다를 경우 오류 처리
       if (adminCode !== envAdminCode) {

@@ -23,15 +23,15 @@ export class StoreProduct {
   description: string;
 
   // 프리미엄, 일반
-  @Column({ default: '일반' })
+  @Column({ default: '일반', nullable: true })
   grade?: string;
 
   // 세트, 낱개
-  @Column({ default: '낱개' })
+  @Column({ default: '낱개', nullable: true })
   type?: string;
 
   // 무게
-  @Column({ default: 0 })
+  @Column({ default: 0, type: 'float', nullable: true })
   weight?: number;
 
   // 가격
@@ -56,7 +56,7 @@ export class StoreProduct {
   // is_active가 false, sold_out가 false인 경우 판매 중지 (판매 중지 상태)
 
   // 이미지
-  @Column()
+  @Column({ nullable: true })
   image?: string;
 
   @ManyToOne(() => Store, (store) => store.store_products)

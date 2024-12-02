@@ -28,32 +28,32 @@ export enum OrderMethod {
 
 @Entity()
 export class Order {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   user_id: number;
 
   @Column({ type: 'varchar', enum: ShipStatus, default: ShipStatus.PAYMENT_WAITING }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
   status: ShipStatus;
 
-  @Column()
+  @Column({ type: 'varchar' })
   order_address: string;
 
   @Column({ type: 'varchar', enum: OrderMethod }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
   order_method: OrderMethod;
 
-  @Column({ default: 0 })
+  @Column({ type: 'bigint', default: 0 })
   total_cash: number;
 
-  @Column()
+  @Column({ type: 'datetime' })
   order_date: Date;
 
   @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @UpdateDateColumn({ nullable: true })
+  updated_at?: Date;
 
   @ManyToOne(() => User, (user) => user.orders)
   @JoinColumn({ name: 'user_id' })

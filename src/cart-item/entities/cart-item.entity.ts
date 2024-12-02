@@ -4,13 +4,13 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 
 @Entity()
 export class CartItem {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   user_id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   store_product_id: number;
 
   @Column()

@@ -15,50 +15,50 @@ import {
 
 @Entity()
 export class Store {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column({ unsigned: true, unique: true })
+  @Column({ unsigned: true, unique: true, type: 'int' })
   user_id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column()
   description: string;
 
-  @Column()
+  @Column({ nullable: true })
   address?: string;
 
-  @Column()
+  @Column({ nullable: true })
   contact?: string;
 
-  @Column()
+  @Column({ nullable: true })
   image?: string;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, type: 'bigint' })
   review_count: number;
 
   @Column({ type: 'decimal', precision: 2, scale: 1, default: 0 })
   rating: number;
 
-  @Column()
+  @Column({ nullable: true, type: 'float' })
   longitude?: number;
 
-  @Column()
+  @Column({ nullable: true, type: 'float' })
   latitude?: number;
 
-  @Column({ default: 0 })
+  @Column({ default: 0, type: 'bigint' })
   total_sales: number;
 
   @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn()
-  updated_at: Date;
+  @UpdateDateColumn({ nullable: true })
+  updated_at?: Date;
 
-  @DeleteDateColumn()
-  deleted_at: Date;
+  @DeleteDateColumn({ nullable: true })
+  deleted_at?: Date;
 
   @OneToOne(() => User, (user) => user.store, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'user_id' })

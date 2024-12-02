@@ -7,5 +7,5 @@ export class UpdateRoleDto {
   userId: number;
 
   @IsEnum(UserRole)
-  role: UserRole;
+  role: UserRole.CUSTOMER | UserRole.SELLER;
 }
