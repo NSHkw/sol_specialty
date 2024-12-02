@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { CartItemService } from 'src/cart-item/cart-item.service';
+import { AuthUtils } from 'src/common/utils/auth.utils';
 
 @Injectable()
 export class OrderService {
@@ -23,6 +24,9 @@ export class OrderService {
 
   // 주문하기
   async create(user: User, createOrderDto: CreateOrderDto) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const { order_address, order_method, order_items } = createOrderDto;
 
     const order = this.orderRepository.create({
@@ -89,6 +93,9 @@ export class OrderService {
 
   // 결제하기
   async pay(user: User, id: number) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const order = await this.orderRepository.findOne({
       where: { id, user_id: user.id },
     });
@@ -114,7 +121,10 @@ export class OrderService {
   }
 
   // 유저의 모든 주문 조회하기
-  findAll(user: User) {
+  async findAll(user: User) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     return this.orderRepository.find({
       where: { user_id: user.id },
       relations: ['order_items'],
@@ -123,6 +133,9 @@ export class OrderService {
 
   // 주문 하나 조회하기
   async findOne(user: User, id: number) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const order = await this.orderRepository.findOne({
       where: { id, user_id: user.id },
       relations: ['user', 'order_items'],
@@ -137,12 +150,18 @@ export class OrderService {
 
   // 주문의 배송 상태 확인하기
   async getOrderStatus(user: User, id: number) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const order = await this.findOne(user, id);
     return order.status;
   }
 
   // 주문 취소하기
   async cancel(user: User, id: number) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const order = await this.findOne(user, id);
 
     if (

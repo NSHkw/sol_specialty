@@ -13,6 +13,7 @@ import { StoreProduct } from './entities/store-product.entity';
 import { Repository } from 'typeorm';
 import { Store } from 'src/store/entities/store.entity';
 import { LocalSpecialty } from 'src/local-specialty/entities/local-specialty.entity';
+import { AuthUtils } from 'src/common/utils/auth.utils';
 
 @Injectable()
 export class StoreProductService {
@@ -32,9 +33,7 @@ export class StoreProductService {
    * @returns
    */
   private async validateStoreOwner(store_id: number, user: User) {
-    if (!user) {
-      throw new UnauthorizedException('로그인 필요');
-    }
+    AuthUtils.validateLogin(user);
 
     const store = await this.storeRepository.findOne({
       where: { id: store_id, user_id: user.id, deleted_at: null },
@@ -54,6 +53,8 @@ export class StoreProductService {
    * @returns
    */
   async create(user: User, store_id: number, createStoreProductDto: CreateStoreProductDto) {
+    AuthUtils.validateLogin(user);
+
     await this.validateStoreOwner(store_id, user);
 
     const { local_specialty_id, stock } = createStoreProductDto;
@@ -126,6 +127,8 @@ export class StoreProductService {
     store_id: number,
     updateStoreProductDto: UpdateStoreProductDto,
   ) {
+    AuthUtils.validateLogin(user);
+
     await this.validateStoreOwner(store_id, user);
 
     const { stock } = updateStoreProductDto;

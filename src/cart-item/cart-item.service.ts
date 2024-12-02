@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CartItem } from './entities/cart-item.entity';
 import { In, Repository } from 'typeorm';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
+import { AuthUtils } from 'src/common/utils/auth.utils';
 
 @Injectable()
 export class CartItemService {
@@ -17,6 +18,8 @@ export class CartItemService {
   ) {}
 
   async create(user: User, createCartItemDto: CreateCartItemDto) {
+    AuthUtils.validateLogin(user);
+
     const { store_product_id, quantity } = createCartItemDto;
 
     const storeProduct = await this.storeProductRepository.findOne({
@@ -50,6 +53,8 @@ export class CartItemService {
   }
 
   async findAll(user: User) {
+    AuthUtils.validateLogin(user);
+
     return this.cartItemRepository.find({
       where: { user },
       relations: ['store_product', 'store_product.store'],

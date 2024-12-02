@@ -11,6 +11,7 @@ import { Store } from './entities/store.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { SearchStoreDto } from './dto/search-store.dto';
+import { AuthUtils } from 'src/common/utils/auth.utils';
 
 // TODO: 상점 판매량 확인 함수 구현
 @Injectable()
@@ -24,6 +25,9 @@ export class StoreService {
 
   // 상점 생성
   async createStore(user: User, createStoreDto: CreateStoreDto) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const { name } = createStoreDto;
 
     // 현재 사용자의 활성화된 상점이 있는지 확인
@@ -60,6 +64,9 @@ export class StoreService {
 
   // 상점 정보 수정
   async updateStore(id: number, user: User, updateStoreDto: UpdateStoreDto) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const existedStore = await this.storeRepository.findOne({
       where: { id, deleted_at: null },
     });
@@ -90,6 +97,9 @@ export class StoreService {
 
   // 상점 삭제
   async deleteStore(id: number, user: User) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const store = await this.storeRepository.findOne({
       where: { id, deleted_at: null },
     });
