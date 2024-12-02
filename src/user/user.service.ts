@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User, UserRole } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { ALLOWED_ROLES, UpdateRoleDto } from './dto/update-role.dto';
 import * as bcrypt from 'bcrypt';
 import { WithdrawDto } from './dto/withdraw.dto';
 
@@ -89,6 +89,10 @@ export class UserService {
 
     if (user.role === UserRole.ADMIN) {
       throw new BadRequestException('관리자는 권한을 수정할 수 없습니다');
+    }
+
+    if (!ALLOWED_ROLES.includes(updateRoleDto.role)) {
+      throw new BadRequestException('올바른 권한을 입력해주세요');
     }
 
     user.role = updateRoleDto.role;
