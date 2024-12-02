@@ -50,12 +50,13 @@ export class StoreController {
     return this.storeService.deleteStore(id, user);
   }
 
-  // 상점 판매량 확인
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.SELLER)
-  @Get(':id/sales')
-  async checkStoreSales(@Param('id') id: number) {
-    return this.storeService.checkStoreSales(id);
+  // 상점 검색 (쿼리 파라미터)
+  @Get('search')
+  @ApiQuery({ name: 'keyword', required: false })
+  @ApiQuery({ name: 'page', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  async search(@Query() searchDto: SearchStoreDto) {
+    return this.storeService.search(searchDto);
   }
 
   // 사이트에 존재하는 모든 상점 조회
@@ -70,12 +71,11 @@ export class StoreController {
     return this.storeService.findStoreById(id);
   }
 
-  // 상점 검색 (쿼리 파라미터)
-  @Get('search')
-  @ApiQuery({ name: 'keyword', required: false })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'limit', required: false })
-  async search(@Query() searchDto: SearchStoreDto) {
-    return this.storeService.search(searchDto);
+  // 상점 판매량 확인
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.SELLER)
+  @Get(':id/sales')
+  async checkStoreSales(@Param('id') id: number) {
+    return this.storeService.checkStoreSales(id);
   }
 }
