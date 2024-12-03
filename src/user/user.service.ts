@@ -6,9 +6,10 @@ import { JwtService } from '@nestjs/jwt';
 import { User, UserRole } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UpdatePasswordDto } from './dto/update-password.dto';
-import { UpdateRoleDto } from './dto/update-role.dto';
+import { ALLOWED_ROLES, UpdateRoleDto } from './dto/update-role.dto';
 import * as bcrypt from 'bcrypt';
 import { WithdrawDto } from './dto/withdraw.dto';
+import { AuthUtils } from 'src/common/utils/auth.utils';
 
 @Injectable()
 export class UserService {
@@ -27,12 +28,16 @@ export class UserService {
 
   // 현재 로그인 한 유저 자신의 프로필 조회
   async getUserProfile(user: User) {
+    AuthUtils.validateLogin(user);
+
     return await this.userRepository.findOne({ where: { id: user.id } });
   }
 
   // 현재 로그인 한 유저 자신의 프로필 수정
   // 수정 가능한 정보: 닉네임, 주소, 전화번호
   async updateProfile(user: User, updateUserDto: UpdateUserDto) {
+    AuthUtils.validateLogin(user);
+
     const { nickname, address, phone } = updateUserDto;
 
     if (nickname) {
@@ -91,6 +96,10 @@ export class UserService {
       throw new BadRequestException('관리자는 권한을 수정할 수 없습니다');
     }
 
+    if (!ALLOWED_ROLES.includes(updateRoleDto.role)) {
+      throw new BadRequestException('올바른 권한을 입력해주세요');
+    }
+
     user.role = updateRoleDto.role;
 
     await this.userRepository.save(user);
@@ -100,6 +109,8 @@ export class UserService {
 
   // 유저 cash 충전하기
   async updateUserCash(user: User, amount: number) {
+    AuthUtils.validateLogin(user);
+
     if (isNaN(amount) || amount <= 0) {
       throw new BadRequestException('유효하지 않은 금액입니다');
     }
@@ -121,6 +132,8 @@ export class UserService {
 
   // 회원 탈퇴
   async withdraw(user: User, withdrawDto: WithdrawDto) {
+    AuthUtils.validateLogin(user);
+
     await this.passwordCheck(user, withdrawDto.currentPassword);
 
     await this.userRepository.softDelete({ id: user.id });

@@ -12,6 +12,7 @@ import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Store } from 'src/store/entities/store.entity';
+import { AuthUtils } from 'src/common/utils/auth.utils';
 
 @Injectable()
 export class ReviewService {
@@ -38,10 +39,8 @@ export class ReviewService {
   }
 
   async create(user: User, createReviewDto: CreateReviewDto) {
-    // 로그인 예외 처리
-    if (!user) {
-      throw new UnauthorizedException('로그인 먼저');
-    }
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
 
     const { store_id, rating, content } = createReviewDto;
 
@@ -74,10 +73,8 @@ export class ReviewService {
   }
 
   async delete(user: User, store_id: number) {
-    // 로그인 예외 처리
-    if (!user) {
-      throw new UnauthorizedException('로그인 먼저');
-    }
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
 
     // 상점 존재 예외처리
     const store = await this.storeRepository.findOne({
@@ -96,10 +93,8 @@ export class ReviewService {
       throw new NotFoundException('이 상점에 대해 리뷰 안적음');
     }
 
-    // 리뷰 권한 예외처리
-    if (existingReview.user_id !== user.id) {
-      throw new ForbiddenException('이 리뷰에 대한 권한 없음');
-    }
+    // 리뷰 소유자 체크
+    AuthUtils.validateResourceOwner(existingReview.user_id, user);
 
     await this.reviewRepository.softDelete(existingReview.id);
 

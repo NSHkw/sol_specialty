@@ -11,9 +11,11 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity()
+@Index(['name', 'deleted_at'], { unique: true })
 export class Store {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
@@ -21,7 +23,7 @@ export class Store {
   @Column({ unsigned: true, unique: true, type: 'int' })
   user_id: number;
 
-  @Column({ unique: true })
+  @Column()
   name: string;
 
   @Column()

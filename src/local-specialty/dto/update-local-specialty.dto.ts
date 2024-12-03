@@ -1,5 +1,6 @@
 import { IsOptional, IsString, IsNotEmpty, MaxLength, IsEnum } from 'class-validator';
 import { Region } from '../types/region.type';
+import { SpecialtySeason } from '../types/season.type';
 
 export class UpdateLocalSpecialtyDto {
   @IsOptional()
@@ -18,6 +19,6 @@ export class UpdateLocalSpecialtyDto {
   region?: Region;
 
   @IsOptional()
-  @IsString()
-  season_info?: string;
+  @IsEnum(SpecialtySeason, { each: true })
+  season_info?: SpecialtySeason[];
 }

@@ -5,6 +5,7 @@ import { ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { OrderType } from './entities/order.entity';
 
 @ApiTags('Order')
 @Controller('order')
@@ -14,10 +15,18 @@ export class OrderController {
   // 주문하기, 장바구니에 있는 물품들 선택 주문, 결제하기, 유저의 모든 주문 조회하기, 주문 하나 조회하기, 주문의 배송 상태 확인하기, 주문 취소하기
 
   // 주문하기
-  @Post()
+  @Post('direct')
   @UseGuards(JwtAuthGuard)
-  async create(@GetUser() user: User, @Body() createOrderDto: CreateOrderDto) {
-    return this.orderService.create(user, createOrderDto);
+  async createDirectOrder(@GetUser() user: User, @Body() createOrderDto: CreateOrderDto) {
+    createOrderDto.order_type = OrderType.DIRECT;
+    return this.orderService.createDirectOrder(user, createOrderDto);
+  }
+
+  @Post('cart')
+  @UseGuards(JwtAuthGuard)
+  async createCartOrder(@GetUser() user: User, @Body() createOrderDto: CreateOrderDto) {
+    createOrderDto.order_type = OrderType.CART;
+    return this.orderService.createCartOrder(user, createOrderDto);
   }
 
   // 결제하기

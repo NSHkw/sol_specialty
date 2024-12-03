@@ -7,6 +7,8 @@ import { Region } from './types/region.type';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchLocalSpecialtyDto } from './dto/search-local-specialty.dto';
 import { UpdateLocalSpecialtyDto } from './dto/update-local-specialty.dto';
+import { AuthUtils } from 'src/common/utils/auth.utils';
+import { SpecialtySeason } from './types/season.type';
 
 // 생성, 삭제, 전체 조회, 지역별 조회, id로 조회, 검색
 @Injectable()
@@ -23,6 +25,9 @@ export class LocalSpecialtyService {
    * @returns 특산품 생성 결과
    */
   async create(user: User, createDto: CreateLocalSpecialtyDto) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const { name } = createDto;
     const existedSpecialty = await this.localSpecialtyRepository.findOne({
       where: { name },
@@ -30,6 +35,11 @@ export class LocalSpecialtyService {
 
     if (existedSpecialty) {
       throw new BadRequestException('이미 존재하는 특산품 이름');
+    }
+
+    // ALL이 포함된 경우 다른 계절을 함께 선택할 수 없도록 검증
+    if (createDto.season_info.includes(SpecialtySeason.ALL) && createDto.season_info.length > 1) {
+      throw new BadRequestException('제철 없음은 다른 계절과 함께 선택할 수 없습니다');
     }
 
     const specialty = this.localSpecialtyRepository.create(createDto);
@@ -44,6 +54,9 @@ export class LocalSpecialtyService {
    * @returns 특산품 삭제 결과
    */
   async delete(user: User, id: number) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const specialty = await this.localSpecialtyRepository.findOne({
       where: { id },
     });
@@ -65,6 +78,9 @@ export class LocalSpecialtyService {
    * @returns 특산품 수정 결과
    */
   async update(user: User, id: number, updateDto: UpdateLocalSpecialtyDto) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const specialty = await this.localSpecialtyRepository.findOne({
       where: { id, deleted_at: IsNull() },
     });
@@ -74,6 +90,8 @@ export class LocalSpecialtyService {
     }
 
     const updatedSpecialty = this.localSpecialtyRepository.create(updateDto);
+
+    await this.localSpecialtyRepository.update(id, updatedSpecialty);
 
     return { message: '수정 완료', updatedSpecialty };
   }

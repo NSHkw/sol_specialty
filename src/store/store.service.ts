@@ -11,41 +11,62 @@ import { Store } from './entities/store.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { SearchStoreDto } from './dto/search-store.dto';
+import { AuthUtils } from 'src/common/utils/auth.utils';
 
 // TODO: 상점 판매량 확인 함수 구현
 @Injectable()
 export class StoreService {
-  constructor(@InjectRepository(Store) private readonly storeRepository: Repository<Store>) {}
+  constructor(
+    @InjectRepository(Store) private readonly storeRepository: Repository<Store>,
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+  ) {}
 
   // 상점 생성, 수정, 삭제, 판매량 확인, 모든 상점 조회, 특정 상점 상세 조회, 상점 검색
 
   // 상점 생성
   async createStore(user: User, createStoreDto: CreateStoreDto) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const { name } = createStoreDto;
 
+    // 현재 사용자의 활성화된 상점이 있는지 확인
     const existingUserStore = await this.storeRepository.findOne({
       where: { user_id: user.id, deleted_at: null },
     });
 
     if (existingUserStore) {
-      throw new ConflictException('이미 상점을 보유하고 있는 사용자입니다.');
+      throw new ConflictException('이미 상점 보유 중인 사용자');
     }
 
+    // 같은 이름의 활성화된 상점이 있는지 확인
     const existedStore = await this.storeRepository.findOne({
       where: { name, deleted_at: null },
     });
 
     if (existedStore) {
-      throw new ConflictException('이미 존재하는 이름의 상점입니다.');
+      throw new ConflictException('이미 존재하는 이름의 상점');
     }
 
-    await this.storeRepository.save({ ...createStoreDto, user_id: user.id });
+    // 새로운 상점 생성
+    const newStore = await this.storeRepository.save({
+      ...createStoreDto,
+      user_id: user.id,
+    });
 
-    return `${user.nickname}님이 ${name}으로 상점을 생성하였습니다.`;
+    const storeOwner = await this.userRepository.findOne({
+      where: { id: user.id },
+      select: { nickname: true },
+    });
+
+    return `${storeOwner.nickname}이 ${name}으로 상점 생성`;
   }
 
   // 상점 정보 수정
   async updateStore(id: number, user: User, updateStoreDto: UpdateStoreDto) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const existedStore = await this.storeRepository.findOne({
       where: { id, deleted_at: null },
     });
@@ -55,7 +76,7 @@ export class StoreService {
     }
 
     if (existedStore.user_id !== user.id) {
-      throw new ForbiddenException('상점 수정에 대한 권한이 없다');
+      throw new ForbiddenException('상점 수정에 대한 권한 X');
     }
 
     const { name } = updateStoreDto;
@@ -71,11 +92,14 @@ export class StoreService {
 
     await this.storeRepository.update(id, updateStoreDto);
 
-    return `${existedStore.name} 상점 정보를 수정하였습니다.`;
+    return `${existedStore.name} 상점 정보 수정`;
   }
 
   // 상점 삭제
   async deleteStore(id: number, user: User) {
+    // 로그인 체크
+    AuthUtils.validateLogin(user);
+
     const store = await this.storeRepository.findOne({
       where: { id, deleted_at: null },
     });
@@ -85,7 +109,7 @@ export class StoreService {
     }
 
     if (store.user_id !== user.id) {
-      throw new ForbiddenException('상점 삭제에 대한 권한이 없다');
+      throw new ForbiddenException('상점 삭제에 대한 권한 X');
     }
 
     await this.storeRepository.softDelete(id);
@@ -120,10 +144,14 @@ export class StoreService {
       },
     });
 
+    if (!stores) {
+      throw new NotFoundException('존재하는 상점 없음');
+    }
+
     return stores.map((store) => ({
       id: store.id,
       name: store.name,
-      local_specialties: store.store_products.map((product) => ({
+      local_specialties: (store.store_products || []).map((product) => ({
         id: product.local_specialty.id,
         name: product.local_specialty.name,
       })),
@@ -184,14 +212,23 @@ export class StoreService {
 
   // 상점 검색 (상점 이름 or 특산품 이름으로 검색)
   async search(searchDto: SearchStoreDto) {
-    const { keyword, page, limit } = searchDto;
+    const page = searchDto.page || 1;
+    const limit = searchDto.limit || 10;
+    const { keyword } = searchDto;
 
     const query = this.storeRepository
       .createQueryBuilder('store')
       .leftJoinAndSelect('store.store_products', 'store_products')
       .leftJoinAndSelect('store_products.local_specialty', 'local_specialty')
-      .leftJoinAndSelect('store.reviews', 'reviews')
-      .select(['store.id', 'store.name', 'store_products', 'local_specialty', 'reviews'])
+      .select([
+        'store.id',
+        'store.name',
+        'store.rating',
+        'store.review_count',
+        'store_products.price',
+        'local_specialty.id',
+        'local_specialty.name',
+      ])
       .where('store.deleted_at IS NULL');
 
     if (keyword) {
@@ -200,28 +237,40 @@ export class StoreService {
       });
     }
 
-    const pagenation = (page - 1) * limit;
-    query.skip(pagenation).take(limit);
+    try {
+      const total = await query.getCount();
+      const stores = await query
+        .take(limit)
+        .skip((page - 1) * limit)
+        .getMany();
 
-    const [stores, total] = await query.getManyAndCount();
+      const formattedStores = stores.map((store) => ({
+        id: store.id,
+        name: store.name,
+        localSpecialties:
+          store.store_products?.map((product) => ({
+            id: product.local_specialty?.id,
+            name: product.local_specialty?.name,
+            price: product.price,
+          })) || [],
+        reviewStats: {
+          averageRating: store.rating || 0,
+          totalReviews: store.review_count || 0,
+        },
+      }));
 
-    const formattedStores = stores.map((store) => ({
-      id: store.id,
-      name: store.name,
-      localSpecialties: store.store_products.map((product) => ({
-        id: product.local_specialty.id,
-        name: product.local_specialty.name,
-        price: product.price,
-      })),
-      reviewStats: {
-        averageRating: store.rating,
-        totalReviews: store.review_count,
-      },
-    }));
-
-    return {
-      stores: formattedStores,
-      meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
-    };
+      return {
+        stores: formattedStores,
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    } catch (error) {
+      console.error('Search error:', error);
+      throw error;
+    }
   }
 }

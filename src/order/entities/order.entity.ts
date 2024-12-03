@@ -26,6 +26,11 @@ export enum OrderMethod {
   POST_OFFICE = '우체국 택배',
 }
 
+export enum OrderType {
+  DIRECT = 'DIRECT', // 직접 구매
+  CART = 'CART', // 장바구니 구매
+}
+
 @Entity()
 export class Order {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
@@ -34,17 +39,25 @@ export class Order {
   @Column({ type: 'int', unsigned: true })
   user_id: number;
 
-  @Column({ type: 'varchar', enum: ShipStatus, default: ShipStatus.PAYMENT_WAITING }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
+  @Column({ type: 'enum', enum: ShipStatus, default: ShipStatus.PAYMENT_WAITING })
   status: ShipStatus;
 
   @Column({ type: 'varchar' })
   order_address: string;
 
-  @Column({ type: 'varchar', enum: OrderMethod }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
+  @Column({ type: 'enum', enum: OrderMethod })
   order_method: OrderMethod;
 
   @Column({ type: 'bigint', default: 0 })
   total_cash: number;
+
+  @Column({
+    type: 'enum',
+    enum: OrderType,
+    default: OrderType.DIRECT,
+    comment: '주문 타입 (직접 구매/장바구니 구매)',
+  })
+  order_type: OrderType;
 
   @Column({ type: 'datetime' })
   order_date: Date;
