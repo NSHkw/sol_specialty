@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CreateOrderDto } from './dto/create-order.dto';
 import { User } from 'src/user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Order, ShipStatus } from './entities/order.entity';
+import { Order, OrderType, ShipStatus } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
@@ -23,72 +23,117 @@ export class OrderService {
   // 주문하기, 유저의 모든 주문 조회하기, 주문 하나 조회하기, 주문의 배송 상태 확인하기, 주문 취소하기
 
   // 주문하기
-  async create(user: User, createOrderDto: CreateOrderDto) {
-    // 로그인 체크
+  async createDirectOrder(user: User, createOrderDto: CreateOrderDto) {
     AuthUtils.validateLogin(user);
 
-    const { order_address, order_method, order_items } = createOrderDto;
+    // 단일 상품 구매 시 재고 확인
+    const storeProduct = await this.storeProductRepository.findOne({
+      where: { id: createOrderDto.order_items[0].store_product_id },
+    });
 
+    if (!storeProduct) {
+      throw new NotFoundException('상품이 존재하지 않습니다');
+    }
+
+    if (storeProduct.stock < createOrderDto.order_items[0].quantity) {
+      throw new BadRequestException('재고가 부족합니다');
+    }
+
+    return this.processOrder(user, createOrderDto);
+  }
+
+  async createCartOrder(user: User, createOrderDto: CreateOrderDto) {
+    AuthUtils.validateLogin(user);
+
+    // 장바구니 상품들의 실제 존재 여부 확인
+    const cartItems = await this.cartItemService.findAll(user);
+    const cartItemMap = new Map(cartItems.map((item) => [item.store_product_id, item]));
+
+    // 장바구니에 있는 상품만 주문 가능하도록 검증
+    for (const orderItem of createOrderDto.order_items) {
+      const cartItem = cartItemMap.get(orderItem.store_product_id);
+      if (!cartItem) {
+        throw new BadRequestException('장바구니에 없는 상품은 주문할 수 없습니다');
+      }
+      if (cartItem.quantity < orderItem.quantity) {
+        throw new BadRequestException('장바구니의 수량보다 많이 주문할 수 없습니다');
+      }
+    }
+
+    return this.processOrder(user, createOrderDto);
+  }
+
+  private async processOrder(user: User, createOrderDto: CreateOrderDto) {
+    const { order_address, order_method, order_items, order_type } = createOrderDto;
+
+    // 1. 주문 기본 정보 생성
     const order = this.orderRepository.create({
       user_id: user.id,
-      order_address: order_address,
-      order_method: order_method,
+      order_address,
+      order_method,
+      order_type,
       order_date: new Date(),
     });
 
     const savedOrder = await this.orderRepository.save(order);
 
-    // 주문할 상품 찾기
-    const storeProducts = await this.storeProductRepository.findByIds(
-      order_items.map((item) => item.store_product_id),
-    );
+    try {
+      // 2. 재고 확인 및 주문 상품 처리 (트랜잭션)
+      await this.orderRepository.manager.transaction(async (transactionalEntityManager) => {
+        const storeProducts = await transactionalEntityManager.findByIds(
+          StoreProduct,
+          order_items.map((item) => item.store_product_id),
+        );
 
-    let total_cash = 0;
+        let total_cash = 0;
+        const orderItems = [];
 
-    const orderItems = order_items.map((item) => {
-      const storeProduct = storeProducts.find((product) => product.id === item.store_product_id);
+        for (const item of order_items) {
+          const storeProduct = storeProducts.find((p) => p.id === item.store_product_id);
 
-      if (!storeProduct) {
-        throw new NotFoundException('존재하지 않는 상품');
-      }
+          if (!storeProduct || storeProduct.stock < item.quantity) {
+            throw new BadRequestException('재고 부족 또는 상품이 존재하지 않습니다');
+          }
 
-      if (storeProduct.stock < item.quantity) {
-        throw new BadRequestException('재고가 부족');
-      }
+          // 재고 감소
+          storeProduct.stock -= item.quantity;
+          await transactionalEntityManager.save(StoreProduct, storeProduct);
 
-      total_cash += storeProduct.price * item.quantity;
+          // 주문 상품 생성
+          total_cash += storeProduct.price * item.quantity;
+          orderItems.push(
+            this.orderItemRepository.create({
+              order_id: savedOrder.id,
+              store_product_id: item.store_product_id,
+              quantity: item.quantity,
+            }),
+          );
+        }
 
-      return this.orderItemRepository.create({
-        order_id: savedOrder.id,
-        store_product_id: item.store_product_id,
-        quantity: item.quantity,
+        await transactionalEntityManager.save(OrderItem, orderItems);
+
+        // 총 금액 업데이트
+        savedOrder.total_cash = total_cash;
+        await transactionalEntityManager.save(Order, savedOrder);
       });
-    });
 
-    await this.orderItemRepository.save(orderItems);
+      // 3. 장바구니 비우기 (장바구니 주문인 경우에만)
+      if (order_type === OrderType.CART) {
+        await this.cartItemService.removeByStoreProductIds(
+          user.id,
+          order_items.map((item) => item.store_product_id),
+        );
+      }
 
-    await Promise.all(
-      createOrderDto.order_items.map((item) => {
-        const storeProduct = storeProducts.find((product) => product.id === item.store_product_id);
-        storeProduct.stock -= item.quantity;
-        return this.storeProductRepository.save(storeProduct);
-      }),
-    );
-
-    if (createOrderDto.from_cart) {
-      await this.cartItemService.removeByStoreProductIds(
-        user.id,
-        order_items.map((item) => item.store_product_id),
-      );
+      return this.orderRepository.findOne({
+        where: { id: savedOrder.id },
+        relations: ['order_items'],
+      });
+    } catch (error) {
+      // 주문 실패 시 주문 정보 삭제
+      await this.orderRepository.remove(savedOrder);
+      throw error;
     }
-
-    savedOrder.total_cash = total_cash;
-    await this.orderRepository.save(savedOrder);
-
-    return this.orderRepository.findOne({
-      where: { id: savedOrder.id },
-      relations: ['order_items'],
-    });
   }
 
   // 결제하기

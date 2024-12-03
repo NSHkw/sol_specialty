@@ -1,13 +1,5 @@
-import {
-  IsString,
-  IsNotEmpty,
-  IsEnum,
-  ValidateNested,
-  IsArray,
-  IsBoolean,
-  IsOptional,
-} from 'class-validator';
-import { OrderMethod } from '../entities/order.entity';
+import { IsString, IsNotEmpty, IsEnum, ValidateNested, IsArray } from 'class-validator';
+import { OrderMethod, OrderType } from '../entities/order.entity';
 import { Type } from 'class-transformer';
 import { CreateOrderItemDto } from './create-order-item.dto';
 
@@ -28,8 +20,8 @@ export class CreateOrderDto {
   @Type(() => CreateOrderItemDto)
   order_items: CreateOrderItemDto[];
 
-  // 장바구니에서 주문할 경우 true
-  @IsBoolean()
-  @IsOptional()
-  from_cart?: boolean;
+  // 장바구니 주문 여부
+  @IsEnum(OrderType)
+  @IsNotEmpty()
+  order_type: OrderType;
 }
