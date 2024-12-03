@@ -42,7 +42,7 @@ export class User {
   @Column({ default: 0 })
   cash: number;
 
-  @Column({ type: 'varchar', enum: UserRole, default: UserRole.CUSTOMER }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.CUSTOMER })
   role: UserRole;
 
   @CreateDateColumn()

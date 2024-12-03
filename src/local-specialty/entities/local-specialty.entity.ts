@@ -23,7 +23,7 @@ export class LocalSpecialty {
   description: string;
 
   @Column({
-    type: 'simple-array',
+    type: 'set',
     enum: SpecialtySeason,
     transformer: {
       to: (value: SpecialtySeason[]) => value.join(','),
@@ -32,7 +32,7 @@ export class LocalSpecialty {
   })
   season_info: SpecialtySeason[];
 
-  @Column({ type: 'varchar', enum: Region }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
+  @Column({ type: 'enum', enum: Region })
   region: Region;
 
   @Column({ nullable: true })
