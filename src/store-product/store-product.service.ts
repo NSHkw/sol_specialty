@@ -160,6 +160,8 @@ export class StoreProductService {
    * @returns
    */
   async delete(product_id: number, store_id: number, user: User) {
+    AuthUtils.validateLogin(user);
+
     await this.validateStoreOwner(store_id, user);
 
     const product = await this.storeProductRepository.findOne({
@@ -170,7 +172,7 @@ export class StoreProductService {
       throw new NotFoundException('상품 존재 X');
     }
 
-    await this.storeProductRepository.delete(product_id);
+    await this.storeProductRepository.remove(product);
 
     return { message: '상품 삭제 완료' };
   }
