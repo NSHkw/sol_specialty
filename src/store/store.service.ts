@@ -231,7 +231,7 @@ export class StoreService {
       ])
       .where('store.deleted_at IS NULL');
 
-    if (keyword) {
+    if (keyword && keyword !== '') {
       query.andWhere('(store.name LIKE :keyword OR local_specialty.name LIKE :keyword)', {
         keyword: `%${keyword}%`,
       });
@@ -243,6 +243,9 @@ export class StoreService {
         .take(limit)
         .skip((page - 1) * limit)
         .getMany();
+
+      console.log('Search keyword:', keyword); // 디버깅용
+      console.log('Found stores:', stores); // 디버깅용
 
       const formattedStores = stores.map((store) => ({
         id: store.id,

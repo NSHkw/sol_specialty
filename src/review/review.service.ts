@@ -26,14 +26,34 @@ export class ReviewService {
   // 리뷰 평균 점수 업데이트
   private async updateStoreRating(store_id: number) {
     const reviews = await this.reviewRepository.find({
-      where: { store_id, deleted_at: null },
+      where: {
+        store_id,
+        deleted_at: null,
+      },
+      select: {
+        rating: true,
+      },
     });
 
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    const averageRating = reviews.length ? totalRating / reviews.length : 0;
+    // 리뷰가 없는 경우 0으로 설정
+    if (!reviews || reviews.length === 0) {
+      await this.storeRepository.update(store_id, {
+        rating: 0,
+        review_count: 0,
+      });
+      return;
+    }
+
+    // decimal 타입의 rating을 명시적으로 number로 변환
+    const totalRating = reviews.reduce((sum, review) => {
+      return sum + Number(review.rating);
+    }, 0);
+
+    // 소수점 한 자리까지 계산하고 문자열이 아닌 숫자로 변환
+    const averageRating = Math.round((totalRating / reviews.length) * 10) / 10;
 
     await this.storeRepository.update(store_id, {
-      rating: Number(averageRating.toFixed(1)),
+      rating: averageRating,
       review_count: reviews.length,
     });
   }
@@ -118,6 +138,14 @@ export class ReviewService {
     if (!store) {
       throw new NotFoundException('존재하지 않는 상점');
     }
+
+    // 리뷰 조회 전에 평균 점수 업데이트
+    await this.updateStoreRating(store_id);
+
+    // 업데이트된 store 정보를 다시 가져옴
+    const updatedStore = await this.storeRepository.findOne({
+      where: { id: store_id, deleted_at: null },
+    });
 
     const reviews = await this.reviewRepository.find({
       where: { store_id, deleted_at: null },
