@@ -81,7 +81,7 @@ export class StoreProductService {
    */
   async findAll(store_id: number) {
     return await this.storeProductRepository.find({
-      where: { store_id, is_active: true },
+      where: { store_id },
       relations: ['local_specialty'],
       select: {
         id: true,
@@ -170,7 +170,7 @@ export class StoreProductService {
       throw new NotFoundException('상품 존재 X');
     }
 
-    await this.storeProductRepository.softDelete(product_id);
+    await this.storeProductRepository.delete(product_id);
 
     return { message: '상품 삭제 완료' };
   }

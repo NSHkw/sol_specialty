@@ -26,8 +26,11 @@ export class LocalSpecialty {
     type: 'set',
     enum: SpecialtySeason,
     transformer: {
-      to: (value: SpecialtySeason[]) => value.join(','),
-      from: (value: string) => value.split(',') as SpecialtySeason[],
+      to: (value: SpecialtySeason[]) => value?.join(',') || '',
+      from: (value: string | null) => {
+        if (!value) return [];
+        return (typeof value === 'string' ? value.split(',') : value) as SpecialtySeason[];
+      },
     },
   })
   season_info: SpecialtySeason[];
