@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Region } from '../types/region.type';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
+import { SpecialtySeason } from '../types/season.type';
 
 @Entity()
 export class LocalSpecialty {
@@ -21,8 +22,15 @@ export class LocalSpecialty {
   @Column({ type: 'text' })
   description: string;
 
-  @Column()
-  season_info: string;
+  @Column({
+    type: 'simple-array',
+    enum: SpecialtySeason,
+    transformer: {
+      to: (value: SpecialtySeason[]) => value.join(','),
+      from: (value: string) => value.split(',') as SpecialtySeason[],
+    },
+  })
+  season_info: SpecialtySeason[];
 
   @Column({ type: 'varchar', enum: Region }) // 실제 타입은 enum이지만 테스트를 위해 타입을 text로 변경
   region: Region;
