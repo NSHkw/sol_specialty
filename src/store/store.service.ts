@@ -267,25 +267,28 @@ const stores = await this.storeRepository.find({
 
     // 검색 결과 처리
     try {
-      const total = await query.getCount();
+      const total = await query.getCount(); // 결과 데이터 수 카운트
       const stores = await query
         .take(limit)
         .skip((page - 1) * limit)
-        .getMany();
+        .getMany(); // 페이지네이션 적용된 결과 조회하기
 
       console.log('Search keyword:', keyword); // 디버깅용
       console.log('Found stores:', stores); // 디버깅용
 
+      // 결과 데이터를 포맷팅
       const formattedStores = stores.map((store) => ({
         id: store.id,
         name: store.name,
         localSpecialties:
           store.store_products?.map((product) => ({
+            // store_products가 없는 경우를 대비해 ?(nullable) 연산자 사용
             id: product.local_specialty?.id,
             name: product.local_specialty?.name,
             price: product.price,
           })) || [],
         reviewStats: {
+          // 리뷰 평균 점수, 리뷰 개수
           averageRating: store.rating || 0,
           totalReviews: store.review_count || 0,
         },
@@ -293,6 +296,7 @@ const stores = await this.storeRepository.find({
 
       return {
         stores: formattedStores,
+        // 현재 몇 페이지인지
         meta: {
           total,
           page,

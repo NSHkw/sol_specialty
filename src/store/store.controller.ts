@@ -50,7 +50,7 @@ export class StoreController {
     return this.storeService.deleteStore(id, user);
   }
 
-  // 상점 검색 (쿼리 파라미터)
+  // 상점 검색
   @Post('search')
   async search(@Body() searchDto: SearchStoreDto) {
     return this.storeService.search(searchDto);
