@@ -62,6 +62,8 @@ export class CartItemService {
   }
 
   async remove(user: User, id: number) {
+    AuthUtils.validateLogin(user);
+
     const cartItem = await this.findOne(user, id);
     await this.cartItemRepository.delete(cartItem.id);
 
