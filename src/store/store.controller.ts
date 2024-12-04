@@ -51,11 +51,8 @@ export class StoreController {
   }
 
   // 상점 검색 (쿼리 파라미터)
-  @Get('search')
-  @ApiQuery({ name: 'keyword', required: false })
-  @ApiQuery({ name: 'page', required: false })
-  @ApiQuery({ name: 'limit', required: false })
-  async search(@Query() searchDto: SearchStoreDto) {
+  @Post('search')
+  async search(@Body() searchDto: SearchStoreDto) {
     return this.storeService.search(searchDto);
   }
 
