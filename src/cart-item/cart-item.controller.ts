@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CartItemService } from './cart-item.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/user/entities/user.entity';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 @ApiTags('CartItem')
 @ApiBearerAuth('access-token')
@@ -38,5 +49,14 @@ export class CartItemController {
   @UseGuards(JwtAuthGuard)
   remove(@GetUser() user: User, @Param('id') id: number) {
     return this.cartItemService.remove(user, id);
+  }
+
+  @Patch(':id')
+  update(
+    @GetUser() user: User,
+    @Param('id') id: number,
+    @Body() updateCartItemDto: UpdateCartItemDto,
+  ) {
+    return this.cartItemService.update(user, id, updateCartItemDto);
   }
 }

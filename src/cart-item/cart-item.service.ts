@@ -7,6 +7,7 @@ import { In, Repository } from 'typeorm';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { AuthUtils } from 'src/common/utils/auth.utils';
 import { DataSource } from 'typeorm';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 @Injectable()
 export class CartItemService {
@@ -73,6 +74,30 @@ export class CartItemService {
       where: { user_id: user.id },
       relations: ['store_product', 'store_product.store'],
     });
+  }
+
+  async update(user: User, id: number, updateCartItemDto: UpdateCartItemDto) {
+    AuthUtils.validateLogin(user);
+
+    const cartItem = await this.findOne(user, id);
+
+    // 상품 재고 확인
+    const storeProduct = await this.storeProductRepository.findOne({
+      where: { id: cartItem.store_product_id },
+    });
+
+    if (!storeProduct) {
+      throw new NotFoundException('상품을 찾을 수 없습니다.');
+    }
+
+    if (storeProduct.stock < updateCartItemDto.quantity) {
+      throw new BadRequestException('재고가 부족합니다.');
+    }
+
+    // 수량 업데이트
+    cartItem.quantity = updateCartItemDto.quantity;
+
+    return await this.cartItemRepository.save(cartItem);
   }
 
   async remove(user: User, id: number) {
