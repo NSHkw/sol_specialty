@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, LessThan } from 'typeorm';
 import { Order, ShipStatus } from '../entities/order.entity';
 
 @Injectable()
@@ -15,9 +15,18 @@ export class OrderScheduler {
   async updateOrderStatus() {
     const orders = await this.orderRepository.find({
       where: [
-        { status: ShipStatus.ORDER_COMPLETED },
-        { status: ShipStatus.SHIP_WAITING },
-        { status: ShipStatus.SHIPPING },
+        {
+          status: ShipStatus.ORDER_COMPLETED,
+          order_date: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+        },
+        {
+          status: ShipStatus.SHIP_WAITING,
+          updated_at: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+        },
+        {
+          status: ShipStatus.SHIPPING,
+          updated_at: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+        },
       ],
     });
 
