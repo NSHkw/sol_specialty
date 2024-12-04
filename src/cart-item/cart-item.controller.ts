@@ -15,10 +15,15 @@ export class CartItemController {
   // 장바구니에 물품 추가하기, 장바구니 모든 물품 조회하기, 장바구니 물품 삭제하기
 
   // 장바구니에 물품 추가하기
-  @Post()
+  // param에 store_id도 추가해야 할 것 같음
+  @Post(':store_id')
   @UseGuards(JwtAuthGuard)
-  async create(@GetUser() user: User, @Body() createCartItemDto: CreateCartItemDto) {
-    return this.cartItemService.create(user, createCartItemDto);
+  async create(
+    @GetUser() user: User,
+    @Param('store_id') store_id: number,
+    @Body() createCartItemDto: CreateCartItemDto,
+  ) {
+    return this.cartItemService.create(user, store_id, createCartItemDto);
   }
 
   // 장바구니 모든 물품 조회하기
