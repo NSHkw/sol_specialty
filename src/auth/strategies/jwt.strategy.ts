@@ -19,13 +19,16 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     private readonly userService: UserService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      // 1. JWT 토큰 추출 방법을 설정한다 (헤더에 있는 Bearer 토큰에서 추출), super이기 때문에, passportStrategy에서 아래 3개의 옵션이 내부적으로 사용됨
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // HTTP 요청 헤더의 Authorization에서 'Bearer' 제외한 나머지 JWT 토큰을 추출
       ignoreExpiration: false,
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
 
   // 토큰 유효 시 이 메소드 실행, user 객체를 request 객체에 추가
+  // 여기서 payload는 passportStrategy에서 토큰을 검증하고 디코딩해서 얻은 페이로드 객체
+  // 디코딩된 payload를 전달해 실행
   async validate(payload: any) {
     return { id: payload.sub, email: payload.email, role: payload.role };
   }

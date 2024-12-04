@@ -24,6 +24,7 @@ export class SignUpDto extends PickType(User, [
   @IsString()
   @IsNotEmpty()
   @IsStrongPassword({
+    // 비밀번호의 강도를 검증 (비밀번호에 강력한 유효성 검사)
     minLength: 8,
     minLowercase: 1,
     minUppercase: 1,
@@ -43,6 +44,7 @@ export class SignUpDto extends PickType(User, [
 
   @IsOptional()
   @IsPhoneNumber('KR')
+  // 전화번호 유효성 검사로 한국 전화번호 형식을 사용('-'없이 총 11자리, 010으로 시작)
   phone?: string;
 
   @IsNotEmpty({ message: '비밀번호 확인을 입력' })
