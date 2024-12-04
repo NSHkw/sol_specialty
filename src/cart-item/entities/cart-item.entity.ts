@@ -13,7 +13,7 @@ export class CartItem {
   @Column({ type: 'int', unsigned: true })
   store_product_id: number;
 
-  @Column()
+  @Column({ type: 'int', unsigned: true })
   quantity: number;
 
   @ManyToOne(() => User, (user) => user.cart_items)
