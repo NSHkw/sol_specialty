@@ -7,13 +7,11 @@ export class SearchStoreDto {
   keyword?: string;
 
   @IsOptional()
-  @Type(() => Number)
   @IsNumber()
   @Min(1)
   page?: number = 1;
 
   @IsOptional()
-  @Type(() => Number)
   @IsNumber()
   @Min(10)
   limit?: number = 10;
