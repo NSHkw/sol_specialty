@@ -1,63 +1,63 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>대한민국 지역별 특산품 지도</title>
     <style>
-    body {
+      body {
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100vh;
         overflow: hidden;
-    }
+      }
 
-    .container {
+      .container {
         display: flex;
         width: 100%;
         height: 100vh;
         margin: 0;
         padding: 0;
-    }
+      }
 
-    .map-container {
+      .map-container {
         flex: 1;
         height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
         padding-top: 40px;
-    }
+      }
 
-    .map-container h1 {
+      .map-container h1 {
         font-size: 32px;
         margin-bottom: 40px;
-    }
+      }
 
-    #korea-map {
+      #korea-map {
         width: 65%;
         height: calc(100vh - 120px);
-    }
+      }
 
-    .region-list {
+      .region-list {
         width: 400px;
         height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         padding: 0 60px;
-    }
+      }
 
-    .region-item {
+      .region-item {
         display: flex;
         align-items: center;
         margin-bottom: 25px;
         cursor: pointer;
         transition: transform 0.2s;
-    }
+      }
 
-    .region-icon {
+      .region-icon {
         width: 50px;
         height: 50px;
         border-radius: 50%;
@@ -66,61 +66,124 @@
         justify-content: center;
         color: white;
         font-size: 24px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
 
-    .region-info {
+      .region-info {
         flex: 1;
         margin-left: 20px;
-    }
+      }
 
-    .region-name {
+      .region-name {
         font-size: 18px;
         font-weight: bold;
         margin-bottom: 5px;
         color: #333;
-    }
+      }
 
-    .region-desc {
+      .region-desc {
         font-size: 15px;
         color: #666;
         line-height: 1.4;
-    }
+      }
 
-    .region-item:hover {
+      .region-item:hover {
         transform: translateX(5px);
-    }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="region-list left"></div>
-        <div class="map-container">
-            <h1>대한민국 지역별 특산품 지도</h1>
-            <object id="korea-map" type="image/svg+xml" data="/images/south-korea.svg"></object>
-        </div>
-        <div class="region-list right"></div>
+      <div class="region-list left"></div>
+      <div class="map-container">
+        <h1>대한민국 지역별 특산품 지도</h1>
+        <object id="korea-map" type="image/svg+xml" data="/images/south-korea.svg"></object>
+      </div>
+      <div class="region-list right"></div>
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const regions = [
-                { name: 'Gyeonggi', korName: '경기도', iconColor: '#3498db', mapColor: '#3498db', icon: '🏢', description: '대한민국의 수도권 중심지입니다.' },
-                { name: 'Gangwon', korName: '강원도', iconColor: '#e74c3c', mapColor: '#e74c3c', icon: '⛰️', description: '아름다운 산과 바다가 있는 관광의 중심지입니다.' },
-                { name: 'North Chungcheong', korName: '충청북도', iconColor: '#f39c12', mapColor: '#f1c40f', icon: '🌄', description: '내륙 중심의 교통과 물류의 요충지입니다.' },
-                { name: 'South Chungcheong', korName: '충청남도', iconColor: '#9b59b6', mapColor: '#27ae60', icon: '🌊', description: '서해안의 수산업과 농업이 발달한 지역입니다.' },
-                { name: 'North Jeolla', korName: '전라북도', iconColor: '#2c3e50', mapColor: '#9b59b6', icon: '🍚', description: '한국 전통 음식의 본고장입니다.' },
-                { name: 'South Jeolla', korName: '전라남도', iconColor: '#8e44ad', mapColor: '#e67e22', icon: '🌾', description: '비옥한 평야와 청정 해역을 보유한 지역입니다.' },
-                { name: 'North Gyeongsang', korName: '경상북도', iconColor: '#16a085', mapColor: '#1abc9c', icon: '🗻', description: '한국의 전통문화와 역사가 살아있는 곳입니다.' },
-                { name: 'South Gyeongsang', korName: '경상남도', iconColor: '#27ae60', mapColor: '#d35400', icon: '🏖️', description: '항만 물류와 해양 관광의 중심지입니다.' },
-                { name: 'Jeju', korName: '제주도', iconColor: '#95a5a6', mapColor: '#7f8c8d', icon: '🌴', description: '아름다운 자연과 독특한 문화가 있는 관광의 섬입니다.' }
-            ];
+      document.addEventListener('DOMContentLoaded', function () {
+        const regions = [
+          {
+            name: 'Gyeonggi',
+            korName: '경기도',
+            iconColor: '#3498db',
+            mapColor: '#3498db',
+            icon: '🏢',
+            description: '대한민국의 수도권 중심지입니다.',
+          },
+          {
+            name: 'Gangwon',
+            korName: '강원도',
+            iconColor: '#e74c3c',
+            mapColor: '#e74c3c',
+            icon: '⛰️',
+            description: '아름다운 산과 바다가 있는 관광의 중심지입니다.',
+          },
+          {
+            name: 'North Chungcheong',
+            korName: '충청북도',
+            iconColor: '#f39c12',
+            mapColor: '#f1c40f',
+            icon: '🌄',
+            description: '내륙 중심의 교통과 물류의 요충지입니다.',
+          },
+          {
+            name: 'South Chungcheong',
+            korName: '충청남도',
+            iconColor: '#9b59b6',
+            mapColor: '#27ae60',
+            icon: '🌊',
+            description: '서해안의 수산업과 농업이 발달한 지역입니다.',
+          },
+          {
+            name: 'North Jeolla',
+            korName: '전라북도',
+            iconColor: '#2c3e50',
+            mapColor: '#9b59b6',
+            icon: '🍚',
+            description: '한국 전통 음식의 본고장입니다.',
+          },
+          {
+            name: 'South Jeolla',
+            korName: '전라남도',
+            iconColor: '#8e44ad',
+            mapColor: '#e67e22',
+            icon: '🌾',
+            description: '비옥한 평야와 청정 해역을 보유한 지역입니다.',
+          },
+          {
+            name: 'North Gyeongsang',
+            korName: '경상북도',
+            iconColor: '#16a085',
+            mapColor: '#1abc9c',
+            icon: '🗻',
+            description: '한국의 전통문화와 역사가 살아있는 곳입니다.',
+          },
+          {
+            name: 'South Gyeongsang',
+            korName: '경상남도',
+            iconColor: '#27ae60',
+            mapColor: '#d35400',
+            icon: '🏖️',
+            description: '항만 물류와 해양 관광의 중심지입니다.',
+          },
+          {
+            name: 'Jeju',
+            korName: '제주도',
+            iconColor: '#95a5a6',
+            mapColor: '#7f8c8d',
+            icon: '🌴',
+            description: '아름다운 자연과 독특한 문화가 있는 관광의 섬입니다.',
+          },
+        ];
 
-            // 좌우 지역 목록 생성
-            const leftList = document.querySelector('.region-list.left');
-            const rightList = document.querySelector('.region-list.right');
+        // 좌우 지역 목록 생성
+        const leftList = document.querySelector('.region-list.left');
+        const rightList = document.querySelector('.region-list.right');
 
-            regions.forEach((region, index) => {
-                const regionElement = `
+        regions.forEach((region, index) => {
+          const regionElement = `
     <div class="region-item">
         <div class="region-icon" style="background-color: ${region.iconColor}">
             ${region.icon}
@@ -132,37 +195,37 @@
     </div>
 `;
 
-                if (index < Math.ceil(regions.length / 2)) {
-                    leftList.innerHTML += regionElement;
-                } else {
-                    rightList.innerHTML += regionElement;
-                }
-            });
-
-            // SVG 지도 색상 설정
-            const svgObject = document.getElementById('korea-map');
-            svgObject.addEventListener('load', function () {
-                const svgDoc = svgObject.contentDocument;
-                const paths = svgDoc.querySelectorAll('path');
-
-                paths.forEach(path => {
-                    const region = regions.find(r => r.name === path.getAttribute('title'));
-                    if (region) {
-                        path.style.fill = region.mapColor;
-                        path.style.stroke = '#FFFFFF';
-                        path.style.strokeWidth = '1';
-
-                        // 호버 효과
-                        path.addEventListener('mouseover', () => {
-                            path.style.opacity = '0.8';
-                        });
-                        path.addEventListener('mouseout', () => {
-                            path.style.opacity = '1';
-                        });
-                    }
-                });
-            });
+          if (index < Math.ceil(regions.length / 2)) {
+            leftList.innerHTML += regionElement;
+          } else {
+            rightList.innerHTML += regionElement;
+          }
         });
+
+        // SVG 지도 색상 설정
+        const svgObject = document.getElementById('korea-map');
+        svgObject.addEventListener('load', function () {
+          const svgDoc = svgObject.contentDocument;
+          const paths = svgDoc.querySelectorAll('path');
+
+          paths.forEach((path) => {
+            const region = regions.find((r) => r.name === path.getAttribute('title'));
+            if (region) {
+              path.style.fill = region.mapColor;
+              path.style.stroke = '#FFFFFF';
+              path.style.strokeWidth = '1';
+
+              // 호버 효과
+              path.addEventListener('mouseover', () => {
+                path.style.opacity = '0.5';
+              });
+              path.addEventListener('mouseout', () => {
+                path.style.opacity = '1';
+              });
+            }
+          });
+        });
+      });
     </script>
-</body>
+  </body>
 </html>

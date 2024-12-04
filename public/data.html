@@ -1,69 +1,69 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>특산물 지역별 조회</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>특산물 지역별 조회</h1>
 
     <!-- 지역별 버튼 -->
     <div id="regionButtons">
-        <button onclick="filterByRegion('서울')">서울</button>
-        <button onclick="filterByRegion('부산')">부산</button>
-        <button onclick="filterByRegion('대구')">대구</button>
-        <button onclick="filterByRegion('인천')">인천</button>
-        <button onclick="filterByRegion('광주')">광주</button>
-        <button onclick="filterByRegion('대전')">대전</button>
-        <button onclick="filterByRegion('울산')">울산</button>
-        <button onclick="filterByRegion('세종')">세종</button>
-        <button onclick="filterByRegion('경기')">경기</button>
-        <button onclick="filterByRegion('강원')">강원</button>
-        <button onclick="filterByRegion('충북')">충북</button>
-        <button onclick="filterByRegion('충남')">충남</button>
-        <button onclick="filterByRegion('전북')">전북</button>
-        <button onclick="filterByRegion('전남')">전남</button>
-        <button onclick="filterByRegion('경북')">경북</button>
-        <button onclick="filterByRegion('경남')">경남</button>
-        <button onclick="filterByRegion('제주')">제주</button>
+      <button onclick="filterByRegion('서울')">서울</button>
+      <button onclick="filterByRegion('부산')">부산</button>
+      <button onclick="filterByRegion('대구')">대구</button>
+      <button onclick="filterByRegion('인천')">인천</button>
+      <button onclick="filterByRegion('광주')">광주</button>
+      <button onclick="filterByRegion('대전')">대전</button>
+      <button onclick="filterByRegion('울산')">울산</button>
+      <button onclick="filterByRegion('세종')">세종</button>
+      <button onclick="filterByRegion('경기')">경기</button>
+      <button onclick="filterByRegion('강원')">강원</button>
+      <button onclick="filterByRegion('충북')">충북</button>
+      <button onclick="filterByRegion('충남')">충남</button>
+      <button onclick="filterByRegion('전북')">전북</button>
+      <button onclick="filterByRegion('전남')">전남</button>
+      <button onclick="filterByRegion('경북')">경북</button>
+      <button onclick="filterByRegion('경남')">경남</button>
+      <button onclick="filterByRegion('제주')">제주</button>
     </div>
 
     <!-- 결과를 출력할 리스트 -->
     <ul id="resultList">
-        <!-- 지역별 데이터가 표시됩니다 -->
+      <!-- 지역별 데이터가 표시됩니다 -->
     </ul>
 
     <script>
-        // 서버에서 데이터 가져오기
-        let specialtyData = [];
+      // 서버에서 데이터 가져오기
+      let specialtyData = [];
 
-        async function fetchSpecialtyData() {
-            const url = 'http://localhost:3000/specialty';
-            try {
-                const response = await fetch(url);
-                specialtyData = await response.json();
-            } catch (error) {
-                console.error('데이터를 가져오는 중 오류 발생:', error);
-            }
+      async function fetchSpecialtyData() {
+        const url = 'http://localhost:3000/specialty';
+        try {
+          const response = await fetch(url);
+          specialtyData = await response.json();
+        } catch (error) {
+          console.error('데이터를 가져오는 중 오류 발생:', error);
         }
+      }
 
-        // 특정 지역 데이터를 필터링하고 이름만 나열
-        function filterByRegion(region) {
-            const resultList = document.getElementById('resultList');
-            resultList.innerHTML = ''; // 기존 리스트 초기화
+      // 특정 지역 데이터를 필터링하고 이름만 나열
+      function filterByRegion(region) {
+        const resultList = document.getElementById('resultList');
+        resultList.innerHTML = ''; // 기존 리스트 초기화
 
-            const filteredData = specialtyData.filter(item => item.region === region);
+        const filteredData = specialtyData.filter((item) => item.region === region);
 
-            // 이름만 리스트에 추가
-            filteredData.forEach(item => {
-                const listItem = document.createElement('li');
-                listItem.textContent = item.name; // 이름만 표시
-                resultList.appendChild(listItem);
-            });
-        }
+        // 이름만 리스트에 추가
+        filteredData.forEach((item) => {
+          const listItem = document.createElement('li');
+          listItem.textContent = item.name; // 이름만 표시
+          resultList.appendChild(listItem);
+        });
+      }
 
-        // 페이지 로드 시 데이터 가져오기
-        document.addEventListener('DOMContentLoaded', fetchSpecialtyData);
+      // 페이지 로드 시 데이터 가져오기
+      document.addEventListener('DOMContentLoaded', fetchSpecialtyData);
     </script>
-</body>
+  </body>
 </html>
