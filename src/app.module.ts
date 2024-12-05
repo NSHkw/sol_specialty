@@ -14,6 +14,9 @@ import { configModuleValidationJoiSchema } from './configs/env-validation.config
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeormModuleOptions } from './configs/database.config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { MapModule } from './map.module';
+import { join } from 'path';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -31,6 +34,15 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     TypeOrmModule.forRootAsync(typeormModuleOptions),
     ScheduleModule.forRoot(),
+    MapModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/',
+      serveStaticOptions: {
+        index: false,
+        extensions: ['html', 'js', 'svg'],
+      },
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
