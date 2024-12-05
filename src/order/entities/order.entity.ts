@@ -48,7 +48,7 @@ export class Order {
   @Column({ type: 'enum', enum: OrderMethod })
   order_method: OrderMethod;
 
-  @Column({ type: 'bigint', default: 0 })
+  @Column({ default: 0 })
   total_cash: number;
 
   @Column({

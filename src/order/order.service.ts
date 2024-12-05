@@ -141,24 +141,48 @@ export class OrderService {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
+    const currentUser = await this.userRepository.findOne({
+      where: { id: user.id },
+    });
+
     const order = await this.orderRepository.findOne({
       where: { id, user_id: user.id },
     });
-
-    if (order.status !== ShipStatus.PAYMENT_WAITING) {
-      throw new BadRequestException('결제 불가');
-    }
-
-    if (user.cash < order.total_cash) {
-      throw new BadRequestException('잔액 부족');
-    }
 
     if (!order) {
       throw new NotFoundException('ID 해당 주문 X');
     }
 
-    user.cash -= order.total_cash;
-    await this.userRepository.save(user);
+    if (order.status !== ShipStatus.PAYMENT_WAITING) {
+      throw new BadRequestException('결제 불가');
+    }
+
+    // 디버깅을 위한 로그 추가
+    console.log('Current user cash:', currentUser.cash);
+    console.log('Order total cash:', order.total_cash);
+
+    // 값이 유효한 숫자인지 확인
+    if (isNaN(order.total_cash)) {
+      throw new BadRequestException('주문 금액이 유효하지 않습니다');
+    }
+
+    if (isNaN(currentUser.cash)) {
+      throw new BadRequestException('사용자 잔액이 유효하지 않습니다');
+    }
+
+    if (currentUser.cash < order.total_cash) {
+      throw new BadRequestException('잔액 부족');
+    }
+
+    // 계산 전 값들을 숫자로 확실하게 변환
+    const newCash = Number(currentUser.cash) - Number(order.total_cash);
+
+    if (isNaN(newCash)) {
+      throw new BadRequestException('잔액 계산 중 오류가 발생했습니다');
+    }
+
+    currentUser.cash = newCash;
+    await this.userRepository.save(currentUser);
     order.status = ShipStatus.ORDER_COMPLETED;
     await this.orderRepository.save(order);
 

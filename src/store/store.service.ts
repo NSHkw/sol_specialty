@@ -138,6 +138,7 @@ export class StoreService {
         rating: true,
         review_count: true,
         store_products: {
+          price: true,
           local_specialty: { id: true, name: true },
         },
       },
@@ -150,9 +151,10 @@ export class StoreService {
     return stores.map((store) => ({
       id: store.id,
       name: store.name,
-      local_specialties: (store.store_products || []).map((product) => ({
+      local_specialties: store.store_products.map((product) => ({
         id: product.local_specialty.id,
         name: product.local_specialty.name,
+        price: product.price,
       })),
       review_stats: {
         // 상점의 평점 출력

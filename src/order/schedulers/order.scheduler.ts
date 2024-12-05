@@ -13,19 +13,24 @@ export class OrderScheduler {
 
   @Cron(CronExpression.EVERY_MINUTE)
   async updateOrderStatus() {
+    // 각 상태별 기준 시간 출력
+    const orderCompletedTime = new Date(Date.now() - 1 * 60 * 1000);
+    const shipWaitingTime = new Date(Date.now() - 2 * 60 * 1000);
+    const shippingTime = new Date(Date.now() - 3 * 60 * 1000);
+
     const orders = await this.orderRepository.find({
       where: [
         {
           status: ShipStatus.ORDER_COMPLETED,
-          order_date: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+          updated_at: LessThan(orderCompletedTime),
         },
         {
           status: ShipStatus.SHIP_WAITING,
-          updated_at: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+          updated_at: LessThan(shipWaitingTime),
         },
         {
           status: ShipStatus.SHIPPING,
-          updated_at: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+          updated_at: LessThan(shippingTime),
         },
       ],
     });
@@ -42,6 +47,7 @@ export class OrderScheduler {
           order.status = ShipStatus.DELIVERY_COMPLETED;
           break;
       }
+
       await this.orderRepository.save(order);
     }
   }
