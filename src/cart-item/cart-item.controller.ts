@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CartItemService } from './cart-item.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { User } from 'src/user/entities/user.entity';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 
 @ApiTags('CartItem')
 @ApiBearerAuth('access-token')
@@ -15,10 +26,15 @@ export class CartItemController {
   // 장바구니에 물품 추가하기, 장바구니 모든 물품 조회하기, 장바구니 물품 삭제하기
 
   // 장바구니에 물품 추가하기
-  @Post()
+  // param에 store_id도 추가해야 할 것 같음
+  @Post(':store_id')
   @UseGuards(JwtAuthGuard)
-  async create(@GetUser() user: User, @Body() createCartItemDto: CreateCartItemDto) {
-    return this.cartItemService.create(user, createCartItemDto);
+  async create(
+    @GetUser() user: User,
+    @Param('store_id') store_id: number,
+    @Body() createCartItemDto: CreateCartItemDto,
+  ) {
+    return this.cartItemService.create(user, store_id, createCartItemDto);
   }
 
   // 장바구니 모든 물품 조회하기
@@ -33,5 +49,14 @@ export class CartItemController {
   @UseGuards(JwtAuthGuard)
   remove(@GetUser() user: User, @Param('id') id: number) {
     return this.cartItemService.remove(user, id);
+  }
+
+  @Patch(':id')
+  update(
+    @GetUser() user: User,
+    @Param('id') id: number,
+    @Body() updateCartItemDto: UpdateCartItemDto,
+  ) {
+    return this.cartItemService.update(user, id, updateCartItemDto);
   }
 }

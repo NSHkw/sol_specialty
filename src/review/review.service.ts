@@ -64,18 +64,20 @@ export class ReviewService {
 
     const { store_id, rating, content } = createReviewDto;
 
-    // 상점 존재 예외처리
-    const existingStore = await this.storeRepository.findOne({
-      where: { id: store_id, deleted_at: null },
-    });
+    // 상점 존재 예외처리와 리뷰 존재 예외처리를 Promise.all로 병렬 처리 가능
+    const [existingStore, existingReview] = await Promise.all([
+      this.storeRepository.findOne({
+        where: { id: store_id, deleted_at: null },
+      }),
+      this.reviewRepository.findOne({
+        where: { user_id: user.id, store_id, deleted_at: null },
+      }),
+    ]);
+
     if (!existingStore) {
       throw new NotFoundException('존재하지 않는 상점');
     }
 
-    // 리뷰 존재 예외처리
-    const existingReview = await this.reviewRepository.findOne({
-      where: { user_id: user.id, store_id, deleted_at: null },
-    });
     if (existingReview) {
       throw new ConflictException('이미 상점에 대한 리뷰를 적었다');
     }
@@ -139,14 +141,6 @@ export class ReviewService {
       throw new NotFoundException('존재하지 않는 상점');
     }
 
-    // 리뷰 조회 전에 평균 점수 업데이트
-    await this.updateStoreRating(store_id);
-
-    // 업데이트된 store 정보를 다시 가져옴
-    const updatedStore = await this.storeRepository.findOne({
-      where: { id: store_id, deleted_at: null },
-    });
-
     const reviews = await this.reviewRepository.find({
       where: { store_id, deleted_at: null },
       relations: ['user'],
@@ -167,10 +161,7 @@ export class ReviewService {
   }
 
   async updateReview(user: User, store_id: number, updateReviewDto: UpdateReviewDto) {
-    // 로그인 예외 처리
-    if (!user) {
-      throw new UnauthorizedException('로그인 먼저');
-    }
+    AuthUtils.validateLogin(user);
 
     // 상점 존재 예외처리
     const store = await this.storeRepository.findOne({
@@ -187,10 +178,8 @@ export class ReviewService {
     if (!existingReview) {
       throw new NotFoundException('이 상점에 대해 리뷰 안 적음');
     }
-    // 리뷰 권한 예외처리
-    if (existingReview.user_id !== user.id) {
-      throw new ForbiddenException('이 리뷰에 대한 권한 없음');
-    }
+
+    AuthUtils.validateResourceOwner(existingReview.user_id, user);
 
     await this.reviewRepository.update(existingReview.id, {
       content: updateReviewDto.content,

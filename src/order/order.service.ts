@@ -222,17 +222,26 @@ export class OrderService {
       await this.userRepository.save(user);
     }
 
-    // 재고 복구
+    // 재고 복구 및 장바구니 복원
     const orderItems = await this.orderItemRepository.find({
       where: { order_id: id },
-      relations: ['store_product'],
+      relations: ['store_product', 'store_product.store'],
     });
 
     await Promise.all(
       orderItems.map(async (item) => {
+        // 재고 복구
         const storeProduct = item.store_product;
         storeProduct.stock += item.quantity;
         await this.storeProductRepository.save(storeProduct);
+
+        // 장바구니 주문이었던 경우에만 장바구니에 다시 추가
+        if (order.order_type === OrderType.CART) {
+          await this.cartItemService.create(user, item.store_product.store_id, {
+            store_product_id: item.store_product_id,
+            quantity: item.quantity,
+          });
+        }
       }),
     );
 
