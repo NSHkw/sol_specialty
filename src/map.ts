@@ -91,14 +91,14 @@ class SpecialtyMap {
 
     const style = document.createElement('style');
     style.textContent = `
-              path {
-                  transition: fill 0.3s ease;
-                  cursor: pointer;
-              }
-              path:hover {
-                  opacity: 0.8;
-              }
-          `;
+            path {
+                transition: fill 0.3s ease;
+                cursor: pointer;
+            }
+            path:hover {
+                opacity: 0.8;
+            }
+        `;
     this.svgMap.appendChild(style);
   }
 
@@ -141,20 +141,20 @@ class SpecialtyMap {
     const legend = document.createElement('div');
     legend.className = 'map-legend';
     legend.innerHTML = `
-              <h2>지역별 특산품</h2>
-              <div class="legend-items">
-                  ${this.regions
-                    .map(
-                      (region) => `
-                      <div class="legend-item">
-                          <span class="color-box" style="background-color: ${region.color}"></span>
-                          <span class="region-name">${region.name}</span>
-                      </div>
-                  `,
-                    )
-                    .join('')}
-              </div>
-          `;
+            <h2>지역별 특산품</h2>
+            <div class="legend-items">
+                ${this.regions
+                  .map(
+                    (region) => `
+                    <div class="legend-item">
+                        <span class="color-box" style="background-color: ${region.color}"></span>
+                        <span class="region-name">${region.name}</span>
+                    </div>
+                `,
+                  )
+                  .join('')}
+            </div>
+        `;
     document.body.appendChild(legend);
   }
 
@@ -164,14 +164,14 @@ class SpecialtyMap {
     const infoWindow = document.createElement('div');
     infoWindow.className = 'info-window';
     infoWindow.innerHTML = `
-              <div class="info-header">
-                  <h3>${region.name} 특산품</h3>
-                  <button class="close-button">&times;</button>
-              </div>
-              <ul>
-                  ${region.specialties.map((specialty) => `<li>${specialty}</li>`).join('')}
-              </ul>
-          `;
+            <div class="info-header">
+                <h3>${region.name} 특산품</h3>
+                <button class="close-button">&times;</button>
+            </div>
+            <ul>
+                ${region.specialties.map((specialty) => `<li>${specialty}</li>`).join('')}
+            </ul>
+        `;
 
     infoWindow.style.position = 'absolute';
     infoWindow.style.left = `${event.pageX + 10}px`;
@@ -195,98 +195,98 @@ class SpecialtyMap {
 
 const style = document.createElement('style');
 style.textContent = `
-      body, html {
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-      }
-      
-      #map-container {
-          width: 100vw;
-          height: 100vh;
-          position: relative;
-          background-color: #f5f5f5;
-      }
-  
-      .map-legend {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          background: white;
-          padding: 15px;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          z-index: 1000;
-      }
-  
-      .legend-items {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 10px;
-      }
-  
-      .legend-item {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-      }
-  
-      .color-box {
-          width: 15px;
-          height: 15px;
-          border-radius: 50%;
-      }
-  
-      .region-name {
-          font-size: 14px;
-      }
-  
-      .info-window {
-          background: white;
-          padding: 15px;
-          border-radius: 8px;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-          z-index: 1000;
-          min-width: 200px;
-      }
-  
-      .info-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 10px;
-      }
-  
-      .info-window h3 {
-          margin: 0;
-          color: #333;
-      }
-  
-      .info-window ul {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-      }
-  
-      .info-window li {
-          padding: 5px 0;
-          border-bottom: 1px solid #eee;
-      }
-  
-      .close-button {
-          background: none;
-          border: none;
-          font-size: 20px;
-          cursor: pointer;
-          padding: 0 5px;
-      }
-  
-      .close-button:hover {
-          color: #666;
-      }
-  `;
+    body, html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+    }
+    
+    #map-container {
+        width: 100vw;
+        height: 100vh;
+        position: relative;
+        background-color: #f5f5f5;
+    }
+
+    .map-legend {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .legend-items {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .color-box {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+    }
+
+    .region-name {
+        font-size: 14px;
+    }
+
+    .info-window {
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        min-width: 200px;
+    }
+
+    .info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .info-window h3 {
+        margin: 0;
+        color: #333;
+    }
+
+    .info-window ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .info-window li {
+        padding: 5px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .close-button {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        padding: 0 5px;
+    }
+
+    .close-button:hover {
+        color: #666;
+    }
+`;
 document.head.appendChild(style);
 
 export default SpecialtyMap;

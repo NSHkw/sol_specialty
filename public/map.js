@@ -13,7 +13,7 @@ class SpecialtyMap {
             name: '이천 쌀',
             lat: 37.272,
             lng: 127.435,
-            url: 'https://www.2000localfood.co.kr/goods/goods_list.php?cateCd=001',
+            url: 'http://www.traveli.co.kr/area/index/45',
           },
           { name: '안성 배', lat: 37.0081, lng: 127.2797 },
           { name: '포천 막걸리', lat: 37.8949, lng: 127.2003 },
