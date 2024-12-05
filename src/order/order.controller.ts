@@ -1,13 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { CreateOrderDto } from './dto/create-order.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { User } from 'src/user/entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { OrderType } from './entities/order.entity';
 
 @ApiTags('Order')
+@ApiBearerAuth('access-token')
 @Controller('order')
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}

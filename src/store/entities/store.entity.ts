@@ -15,12 +15,11 @@ import {
 } from 'typeorm';
 
 @Entity()
-@Index(['name', 'deleted_at'], { unique: true })
 export class Store {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column({ unsigned: true, unique: true, type: 'int' })
+  @Column({ unsigned: true, type: 'int' })
   user_id: number;
 
   @Column()
@@ -58,9 +57,6 @@ export class Store {
 
   @UpdateDateColumn({ nullable: true })
   updated_at?: Date;
-
-  @DeleteDateColumn({ nullable: true })
-  deleted_at?: Date;
 
   @OneToOne(() => User, (user) => user.store, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'user_id' })

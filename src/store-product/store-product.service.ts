@@ -36,7 +36,7 @@ export class StoreProductService {
     AuthUtils.validateLogin(user);
 
     const store = await this.storeRepository.findOne({
-      where: { id: store_id, user_id: user.id, deleted_at: null },
+      where: { id: store_id, user_id: user.id },
     });
     if (!store) {
       throw new ForbiddenException('상점에 대한 권한 X');

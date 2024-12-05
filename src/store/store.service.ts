@@ -32,7 +32,7 @@ export class StoreService {
 
     // 현재 사용자의 활성화된 상점이 있는지 확인
     const existingUserStore = await this.storeRepository.findOne({
-      where: { user_id: user.id, deleted_at: null },
+      where: { user_id: user.id },
     });
 
     if (existingUserStore) {
@@ -41,7 +41,7 @@ export class StoreService {
 
     // 같은 이름의 활성화된 상점이 있는지 확인
     const existedStore = await this.storeRepository.findOne({
-      where: { name, deleted_at: null },
+      where: { name },
     });
 
     if (existedStore) {
@@ -68,7 +68,7 @@ export class StoreService {
     AuthUtils.validateLogin(user);
 
     const existedStore = await this.storeRepository.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!existedStore) {
@@ -82,7 +82,7 @@ export class StoreService {
     const { name } = updateStoreDto;
     if (name && name !== existedStore.name) {
       const existingStore = await this.storeRepository.findOne({
-        where: { name, deleted_at: null },
+        where: { name },
       });
 
       if (existingStore) {
@@ -101,7 +101,7 @@ export class StoreService {
     AuthUtils.validateLogin(user);
 
     const store = await this.storeRepository.findOne({
-      where: { id, deleted_at: null },
+      where: { id },
     });
 
     if (!store) {
@@ -112,7 +112,7 @@ export class StoreService {
       throw new ForbiddenException('상점 삭제에 대한 권한 X');
     }
 
-    await this.storeRepository.softDelete(id);
+    await this.storeRepository.delete(id);
 
     return `${store.name} 상점이 삭제됨`;
   }
@@ -124,7 +124,6 @@ export class StoreService {
   // 모든 상점들 조회 시 각 상점 이름, 상점에서 판매하는 특산품, 리뷰 평균 점수, 리뷰 개수를 보여줘야 함
   async findAllStores() {
     const stores = await this.storeRepository.find({
-      where: { deleted_at: null },
       relations: {
         // store와 연관 관계 있는 테이블과 join
         store_products: {
@@ -167,7 +166,7 @@ export class StoreService {
   // 특정 상점 상세 조회 시 상점 이름, 상점 소개, 상점에서 판매하는 모든 특산품, 리뷰 평균 점수, 주소, 연락처, 이미지, 위도, 경도를 보여줘야 함
   async findStoreById(id: number) {
     const stores = await this.storeRepository.find({
-      where: { id, deleted_at: null },
+      where: { id },
       relations: {
         store_products: {
           local_specialty: true,
