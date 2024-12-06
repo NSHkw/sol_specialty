@@ -245,9 +245,6 @@ export class StoreService {
         .skip((page - 1) * limit)
         .getMany();
 
-      console.log('Search keyword:', keyword); // 디버깅용
-      console.log('Found stores:', stores); // 디버깅용
-
       const formattedStores = stores.map((store) => ({
         id: store.id,
         name: store.name,
