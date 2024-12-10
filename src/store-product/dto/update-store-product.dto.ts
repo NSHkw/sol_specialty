@@ -1,4 +1,39 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateStoreProductDto } from './create-store-product.dto';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class UpdateStoreProductDto extends PartialType(CreateStoreProductDto) {}
+export class UpdateStoreProductDto {
+  @IsString()
+  @IsOptional()
+  product_name?: string;
+
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+  @IsNumber()
+  @IsOptional()
+  price?: number;
+
+  @IsNumber()
+  @IsOptional()
+  stock?: number;
+
+  @IsString()
+  @IsOptional()
+  grade?: string;
+
+  @IsString()
+  @IsOptional()
+  type?: string;
+
+  @IsNumber()
+  @IsOptional()
+  weight?: number;
+
+  @IsString()
+  @IsOptional()
+  image?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  is_active?: boolean;
+}

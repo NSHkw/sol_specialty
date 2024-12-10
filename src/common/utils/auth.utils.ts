@@ -1,0 +1,28 @@
+import { UnauthorizedException } from '@nestjs/common';
+import { User } from 'src/user/entities/user.entity';
+
+export class AuthUtils {
+  /**
+   * 로그인 상태 확인
+   * @param user 유저 객체
+   * @throws UnauthorizedException 로그인하지 않은 경우
+   */
+  static validateLogin(user: User): void {
+    if (!user) {
+      throw new UnauthorizedException('로그인이 필요한 서비스입니다.');
+    }
+  }
+
+  /**
+   * 특정 유저의 리소스 접근 권한 확인
+   * @param resourceUserId 리소스 소유자 ID
+   * @param currentUser 현재 로그인한 유저
+   * @throws UnauthorizedException 권한이 없는 경우
+   */
+  static validateResourceOwner(resourceUserId: number, currentUser: User): void {
+    // 리소스 소유자와 현재 로그인한 유저가 다른 경우 (리뷰 삭제, 수정 관련에 쓰임)
+    if (resourceUserId !== currentUser.id) {
+      throw new UnauthorizedException('해당 리소스에 대한 권한이 없습니다.');
+    }
+  }
+}
