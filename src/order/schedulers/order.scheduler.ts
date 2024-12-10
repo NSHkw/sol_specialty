@@ -14,19 +14,24 @@ export class OrderScheduler {
   // cron: 정해진 시간에 자동으로 작업 실행하게 해주는 스케줄러 데코레이터
   @Cron(CronExpression.EVERY_MINUTE) // 매 1분마다 아래 함수를 실행하라는 데코레이터
   async updateOrderStatus() {
+    // 각 상태별 기준 시간 출력
+    const orderCompletedTime = new Date(Date.now() - 1 * 60 * 1000);
+    const shipWaitingTime = new Date(Date.now() - 2 * 60 * 1000);
+    const shippingTime = new Date(Date.now() - 3 * 60 * 1000);
+
     const orders = await this.orderRepository.find({
       where: [
         {
           status: ShipStatus.ORDER_COMPLETED,
-          order_date: LessThan(new Date(Date.now() - 1 * 60 * 1000)), // 각 주문별 시간 추적이 필요 (less than으로 시작 조건 추가, 1분)
+          updated_at: LessThan(orderCompletedTime),
         },
         {
           status: ShipStatus.SHIP_WAITING,
-          updated_at: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+          updated_at: LessThan(shipWaitingTime),
         },
         {
           status: ShipStatus.SHIPPING,
-          updated_at: LessThan(new Date(Date.now() - 1 * 60 * 1000)),
+          updated_at: LessThan(shippingTime),
         },
       ],
     });
@@ -43,6 +48,7 @@ export class OrderScheduler {
           order.status = ShipStatus.DELIVERY_COMPLETED;
           break;
       }
+
       await this.orderRepository.save(order);
     }
     // 주문 상태 흐름

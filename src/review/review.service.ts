@@ -1,10 +1,4 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { User } from 'src/user/entities/user.entity';
@@ -67,7 +61,7 @@ export class ReviewService {
     // 상점 존재 예외처리와 리뷰 존재 예외처리를 Promise.all로 병렬 처리 가능
     const [existingStore, existingReview] = await Promise.all([
       this.storeRepository.findOne({
-        where: { id: store_id, deleted_at: null },
+        where: { id: store_id },
       }),
       this.reviewRepository.findOne({
         where: { user_id: user.id, store_id, deleted_at: null },
@@ -100,7 +94,7 @@ export class ReviewService {
 
     // 상점 존재 예외처리
     const store = await this.storeRepository.findOne({
-      where: { id: store_id, deleted_at: null },
+      where: { id: store_id },
     });
 
     if (!store) {
@@ -134,7 +128,7 @@ export class ReviewService {
 
   async getReviews(store_id: number) {
     const store = await this.storeRepository.findOne({
-      where: { id: store_id, deleted_at: null },
+      where: { id: store_id },
     });
 
     if (!store) {
@@ -165,7 +159,7 @@ export class ReviewService {
 
     // 상점 존재 예외처리
     const store = await this.storeRepository.findOne({
-      where: { id: store_id, deleted_at: null },
+      where: { id: store_id },
     });
     if (!store) {
       throw new NotFoundException('존재하지 않는 상점');

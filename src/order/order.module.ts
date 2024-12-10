@@ -10,6 +10,7 @@ import { User } from 'src/user/entities/user.entity';
 import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CartItemModule } from 'src/cart-item/cart-item.module';
+import { OrderScheduler } from './schedulers/order.scheduler';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { CartItemModule } from 'src/cart-item/cart-item.module';
     forwardRef(() => UserModule),
   ],
   controllers: [OrderController],
-  providers: [OrderService],
+  providers: [OrderService, OrderScheduler],
 })
 export class OrderModule {}

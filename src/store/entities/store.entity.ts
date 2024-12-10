@@ -15,13 +15,11 @@ import {
 } from 'typeorm';
 
 @Entity()
-@Index(['name', 'deleted_at'], { unique: true }) // 복합 인덱스
-// deleted_at이 존재하는 name을 유니크하게 만드는 것 (소프트 삭제된 상점의 이름을 사용 못하게 되는 경우가 존재해서 만든 인덱스)
 export class Store {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column({ unsigned: true, unique: true, type: 'int' })
+  @Column({ unsigned: true, type: 'int' })
   user_id: number;
 
   @Column()
@@ -62,9 +60,6 @@ export class Store {
 
   @UpdateDateColumn({ nullable: true })
   updated_at?: Date;
-
-  @DeleteDateColumn({ nullable: true })
-  deleted_at?: Date;
 
   @OneToOne(() => User, (user) => user.store, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'user_id' }) // 관계 설정 시 어떤 컬럼을 외래 키로 설정할 지

@@ -37,7 +37,7 @@ export class StoreProductService {
 
     // store 테이블에서 store_id와 user_id가 일치한 것을 가져오는 것
     const store = await this.storeRepository.findOne({
-      where: { id: store_id, user_id: user.id, deleted_at: null },
+      where: { id: store_id, user_id: user.id },
     });
     if (!store) {
       throw new ForbiddenException('상점에 대한 권한 X');
