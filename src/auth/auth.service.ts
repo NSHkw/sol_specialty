@@ -22,8 +22,10 @@ export class AuthService {
    * @returns
    */
   private async generatedToken(user: User) {
+    // 토큰에 포함시킬 데이터
     const payload = { sub: user.id, email: user.email, role: user.role };
 
+    // JWT 토큰 생성 (signAsync는 비동기적으로 JWT를 생성하는 데 사용)
     const accessToken = await this.jwtService.signAsync(payload, {
       secret: this.configService.get<string>('JWT_SECRET'),
       expiresIn: this.configService.get<string>('JWT_EXPIRATION_TIME'),

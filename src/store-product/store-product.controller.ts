@@ -72,7 +72,7 @@ export class StoreProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @HttpCode(HttpStatus.OK)
-  asyncdelete(
+  async delete(
     @Param('product_id') product_id: number,
     @Param('store_id') store_id: number,
     @GetUser() user: User,

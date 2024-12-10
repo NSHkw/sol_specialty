@@ -35,6 +35,7 @@ export class StoreProductService {
   private async validateStoreOwner(store_id: number, user: User) {
     AuthUtils.validateLogin(user);
 
+    // store 테이블에서 store_id와 user_id가 일치한 것을 가져오는 것
     const store = await this.storeRepository.findOne({
       where: { id: store_id, user_id: user.id },
     });
@@ -146,6 +147,7 @@ export class StoreProductService {
       {
         ...updateStoreProductDto,
         sold_out: stock !== undefined ? (stock > 0 ? false : true) : product.sold_out,
+        // 재고가 비었을 경우 sold_out을 업데이트
       },
     );
 
