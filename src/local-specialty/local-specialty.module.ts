@@ -3,9 +3,9 @@ import { LocalSpecialtyService } from './local-specialty.service';
 import { LocalSpecialtyController } from './local-specialty.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { LocalSpecialty } from './entities/local-specialty.entity';
-import { UserModule } from 'src/user/user.module';
-import { AuthModule } from 'src/auth/auth.module';
-import { User } from 'src/user/entities/user.entity';
+import { UserModule } from '../user/user.module';
+import { AuthModule } from '../auth/auth.module';
+import { User } from '../user/entities/user.entity';
 
 @Module({
   imports: [

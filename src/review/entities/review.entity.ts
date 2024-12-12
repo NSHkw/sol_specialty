@@ -1,6 +1,6 @@
 import { Min, Max } from 'class-validator';
-import { Store } from 'src/store/entities/store.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Store } from '../../store/entities/store.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -12,7 +12,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('review')
 export class Review {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;

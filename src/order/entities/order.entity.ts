@@ -1,5 +1,5 @@
-import { OrderItem } from 'src/order/entities/order-item.entity';
-import { User } from 'src/user/entities/user.entity';
+import { OrderItem } from './order-item.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
@@ -31,7 +31,7 @@ export enum OrderType {
   CART = 'CART', // 장바구니 구매
 }
 
-@Entity()
+@Entity('order')
 export class Order {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
