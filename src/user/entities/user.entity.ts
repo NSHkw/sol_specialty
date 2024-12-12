@@ -19,7 +19,7 @@ export enum UserRole {
   ADMIN = 'ADMIN',
 }
 
-@Entity()
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;

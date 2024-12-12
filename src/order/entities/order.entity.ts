@@ -31,7 +31,7 @@ export enum OrderType {
   CART = 'CART', // 장바구니 구매
 }
 
-@Entity()
+@Entity('order')
 export class Order {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;

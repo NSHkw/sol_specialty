@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('order_item')
 export class OrderItem {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;

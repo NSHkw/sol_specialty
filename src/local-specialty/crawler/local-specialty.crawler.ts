@@ -59,8 +59,19 @@ export class LocalSpecialtyCrawler {
 
       const $ = cheerio.load(response.data);
 
-      // 지역 이름 설정 [강원도, 강릉시]
-      const regionFullName: string = $('.top_area h3').text().trim().split(' ')[0];
+      const fullLocation = $('.top_area h3')
+        .clone()
+        .children()
+        .remove()
+        .end()
+        .text()
+        .trim()
+        .split(' ');
+
+      const regionFullName = fullLocation[0];
+      const cityName = fullLocation[1] || '';
+
+      this.logger.log(`지역: ${regionFullName}, 도시: ${cityName}`);
 
       this.logger.log(regionFullName);
 
@@ -85,6 +96,7 @@ export class LocalSpecialtyCrawler {
             description,
             seasonInfo: this.parseSeasonInfo(seasonText),
             region,
+            city: cityName,
             imageUrl,
           };
         })
@@ -94,33 +106,43 @@ export class LocalSpecialtyCrawler {
       await Promise.all(
         specialties.map(async (specialty) => {
           const existing = await this.localSpecialty.findOne({
-            where: { name: specialty.name, region: specialty.region },
+            where: {
+              name: specialty.name,
+              region: specialty.region,
+              city: specialty.city, // 시/군까지 포함하여 중복 체크
+            },
           });
 
           if (existing) {
-            // 기존 데이터 업데이트
             await this.localSpecialty.update(
-              { name: specialty.name, region: specialty.region },
+              {
+                name: specialty.name,
+                region: specialty.region,
+                city: specialty.city,
+              },
               {
                 description: specialty.description,
                 season_info: specialty.seasonInfo,
-                region: specialty.region,
                 image: specialty.imageUrl,
               },
             );
-            this.logger.log(`Updated specialty: ${specialty.name} from ${regionFullName}`);
+            this.logger.log(
+              `Updated specialty: ${specialty.name} from ${regionFullName} ${cityName}`,
+            );
           } else {
-            // 새로운 데이터 저장
             const newSpecialty = this.localSpecialty.create({
               name: specialty.name,
               description: specialty.description,
               season_info: specialty.seasonInfo,
               region: specialty.region,
+              city: specialty.city,
               image: specialty.imageUrl,
             });
 
             await this.localSpecialty.save(newSpecialty);
-            this.logger.log(`Saved specialty: ${specialty.name} from ${regionFullName}`);
+            this.logger.log(
+              `Saved specialty: ${specialty.name} from ${regionFullName} ${cityName}`,
+            );
           }
         }),
       );

@@ -37,6 +37,9 @@ export class CrawlLocalSpecialty {
   @Column({ type: 'enum', enum: Region })
   region: Region;
 
+  @Column({ type: 'varchar' }) // 시/군 단위 추가 (강릉시, 속초시 등)
+  city: string;
+
   @Column({ nullable: true })
   image?: string;
 

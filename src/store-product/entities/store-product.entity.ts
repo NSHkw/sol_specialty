@@ -4,7 +4,7 @@ import { OrderItem } from '../../order/entities/order-item.entity';
 import { Store } from '../../store/entities/store.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('store_product')
 export class StoreProduct {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;

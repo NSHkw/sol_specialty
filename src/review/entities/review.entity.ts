@@ -12,7 +12,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity()
+@Entity('review')
 export class Review {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
