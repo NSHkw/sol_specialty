@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "tsc",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -18,7 +18,8 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "start:test": "set NODE_ENV=test&& nest start"
+    "start:test": "set NODE_ENV=test&& nest start",
+    "crawl": "ts-node src/crawl.ts crawl-specialty"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -33,12 +34,15 @@
     "@nestjs/swagger": "^8.0.7",
     "@nestjs/typeorm": "^10.0.2",
     "@types/lodash": "^4.17.13",
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
+    "cheerio": "^1.0.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "joi": "^17.13.3",
     "lodash": "^4.17.21",
     "mysql2": "^3.11.4",
+    "nest-commander": "^3.15.0",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-local": "^1.0.0",

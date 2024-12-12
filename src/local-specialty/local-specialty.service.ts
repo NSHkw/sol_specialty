@@ -1,13 +1,14 @@
+// src/local-specialty/local-specialty.service.ts
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { LocalSpecialty } from './entities/local-specialty.entity';
 import { IsNull, Like, Repository } from 'typeorm';
 import { CreateLocalSpecialtyDto } from './dto/create-local-specialty.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Region } from './types/region.type';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchLocalSpecialtyDto } from './dto/search-local-specialty.dto';
 import { UpdateLocalSpecialtyDto } from './dto/update-local-specialty.dto';
-import { AuthUtils } from 'src/common/utils/auth.utils';
+import { AuthUtils } from '../common/utils/auth.utils';
 import { SpecialtySeason } from './types/season.type';
 
 // 생성, 삭제, 전체 조회, 지역별 조회, id로 조회, 검색

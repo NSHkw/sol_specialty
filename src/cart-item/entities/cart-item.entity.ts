@@ -1,8 +1,8 @@
-import { StoreProduct } from 'src/store-product/entities/store-product.entity';
-import { User } from 'src/user/entities/user.entity';
+import { StoreProduct } from '../../store-product/entities/store-product.entity';
+import { User } from '../../user/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('cart_item')
 export class CartItem {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
