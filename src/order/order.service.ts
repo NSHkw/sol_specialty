@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOrderDto } from './dto/create-order.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order, OrderType, ShipStatus } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { OrderItem } from './entities/order-item.entity';
-import { StoreProduct } from 'src/store-product/entities/store-product.entity';
-import { CartItemService } from 'src/cart-item/cart-item.service';
-import { AuthUtils } from 'src/common/utils/auth.utils';
+import { StoreProduct } from '../store-product/entities/store-product.entity';
+import { CartItemService } from '../cart-item/cart-item.service';
+import { AuthUtils } from '../common/utils/auth.utils';
+import { DirectOrderDto } from './dto/direct-order.dto';
+import { CartOrderDto } from './dto/cart-order.dto';
 
 @Injectable()
 export class OrderService {
@@ -23,26 +24,27 @@ export class OrderService {
   // 주문하기, 유저의 모든 주문 조회하기, 주문 하나 조회하기, 주문의 배송 상태 확인하기, 주문 취소하기
 
   // 주문하기
-  async createDirectOrder(user: User, createOrderDto: CreateOrderDto) {
+  async createDirectOrder(user: User, createOrderDto: DirectOrderDto) {
     AuthUtils.validateLogin(user);
+    const { store_product_id, quantity } = createOrderDto;
 
     // 단일 상품 구매 시 재고 확인
     const storeProduct = await this.storeProductRepository.findOne({
-      where: { id: createOrderDto.order_items[0].store_product_id },
+      where: { id: store_product_id },
     });
 
     if (!storeProduct) {
       throw new NotFoundException('상품이 존재하지 않습니다');
     }
 
-    if (storeProduct.stock < createOrderDto.order_items[0].quantity) {
+    if (storeProduct.stock < quantity) {
       throw new BadRequestException('재고가 부족합니다');
     }
 
-    return this.processOrder(user, createOrderDto);
+    return this.processOrder(user, createOrderDto, OrderType.DIRECT);
   }
 
-  async createCartOrder(user: User, createOrderDto: CreateOrderDto) {
+  async createCartOrder(user: User, createOrderDto: CartOrderDto) {
     AuthUtils.validateLogin(user);
 
     // 장바구니 상품들의 실제 존재 여부 확인
@@ -60,18 +62,22 @@ export class OrderService {
       }
     }
 
-    return this.processOrder(user, createOrderDto);
+    return this.processOrder(user, createOrderDto, OrderType.CART);
   }
 
-  private async processOrder(user: User, createOrderDto: CreateOrderDto) {
-    const { order_address, order_method, order_items, order_type } = createOrderDto;
+  private async processOrder(
+    user: User,
+    orderDto: DirectOrderDto | CartOrderDto,
+    orderType: OrderType,
+  ) {
+    const { order_address, order_method } = orderDto;
 
     // 1. 주문 기본 정보 생성
     const order = this.orderRepository.create({
       user_id: user.id,
       order_address,
       order_method,
-      order_type,
+      order_type: orderType,
       order_date: new Date(),
     });
 
@@ -80,48 +86,69 @@ export class OrderService {
     try {
       // 2. 재고 확인 및 주문 상품 처리 (트랜잭션)
       await this.orderRepository.manager.transaction(async (transactionalEntityManager) => {
-        const storeProducts = await transactionalEntityManager.findByIds(
-          StoreProduct,
-          order_items.map((item) => item.store_product_id),
-        );
-
         let total_cash = 0;
         const orderItems = [];
 
-        for (const item of order_items) {
-          const storeProduct = storeProducts.find((p) => p.id === item.store_product_id);
+        if (orderType === OrderType.DIRECT) {
+          const directDto = orderDto as DirectOrderDto;
+          const storeProduct = await transactionalEntityManager.findOne(StoreProduct, {
+            where: { id: directDto.store_product_id },
+          });
 
-          if (!storeProduct || storeProduct.stock < item.quantity) {
-            throw new BadRequestException('재고 부족 또는 상품이 존재하지 않습니다');
+          if (!storeProduct) {
+            throw new BadRequestException('상품 존재 X');
           }
 
-          // 재고 감소
-          storeProduct.stock -= item.quantity;
+          storeProduct.stock -= directDto.quantity;
           await transactionalEntityManager.save(StoreProduct, storeProduct);
 
-          // 주문 상품 생성
-          total_cash += storeProduct.price * item.quantity;
+          total_cash = storeProduct.price * directDto.quantity;
           orderItems.push(
             this.orderItemRepository.create({
               order_id: savedOrder.id,
-              store_product_id: item.store_product_id,
-              quantity: item.quantity,
+              store_product_id: directDto.store_product_id,
+              quantity: directDto.quantity,
             }),
           );
+        } else {
+          const cartDto = orderDto as CartOrderDto;
+          const storeProducts = await transactionalEntityManager.findByIds(
+            StoreProduct,
+            cartDto.order_items.map((item) => item.store_product_id),
+          );
+
+          for (const item of cartDto.order_items) {
+            const storeProduct = storeProducts.find((p) => p.id === item.store_product_id);
+
+            if (!storeProduct || storeProduct.stock < item.quantity) {
+              throw new BadRequestException('재고 부족 or 상품 존재 X');
+            }
+
+            storeProduct.stock -= item.quantity;
+            await transactionalEntityManager.save(StoreProduct, storeProduct);
+
+            total_cash += storeProduct.price * item.quantity;
+            orderItems.push(
+              this.orderItemRepository.create({
+                order_id: savedOrder.id,
+                store_product_id: item.store_product_id,
+                quantity: item.quantity,
+              }),
+            );
+          }
         }
 
         await transactionalEntityManager.save(OrderItem, orderItems);
-
-        // 총 금액 업데이트
         savedOrder.total_cash = total_cash;
         await transactionalEntityManager.save(Order, savedOrder);
       });
 
       // 3. 장바구니 비우기 (장바구니 주문인 경우에만)
-      if (order_type === OrderType.CART) {
+      if (orderType === OrderType.CART) {
+        const cartDto = orderDto as CartOrderDto;
         await this.cartItemService.removeByStoreProductIds(
           user.id,
-          order_items.map((item) => item.store_product_id),
+          cartDto.order_items.map((item) => item.store_product_id),
         );
       }
 
