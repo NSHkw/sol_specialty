@@ -1,11 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
-import { CreateOrderDto } from './dto/create-order.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { User } from 'src/user/entities/user.entity';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { OrderType } from './entities/order.entity';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { User } from '../user/entities/user.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { DirectOrderDto } from './dto/direct-order.dto';
+import { CartOrderDto } from './dto/cart-order.dto';
 
 @ApiTags('Order')
 @ApiBearerAuth('access-token')
@@ -18,15 +18,13 @@ export class OrderController {
   // 주문하기
   @Post('direct')
   @UseGuards(JwtAuthGuard)
-  async createDirectOrder(@GetUser() user: User, @Body() createOrderDto: CreateOrderDto) {
-    createOrderDto.order_type = OrderType.DIRECT;
+  async createDirectOrder(@GetUser() user: User, @Body() createOrderDto: DirectOrderDto) {
     return this.orderService.createDirectOrder(user, createOrderDto);
   }
 
   @Post('cart')
   @UseGuards(JwtAuthGuard)
-  async createCartOrder(@GetUser() user: User, @Body() createOrderDto: CreateOrderDto) {
-    createOrderDto.order_type = OrderType.CART;
+  async createCartOrder(@GetUser() user: User, @Body() createOrderDto: CartOrderDto) {
     return this.orderService.createCartOrder(user, createOrderDto);
   }
 
