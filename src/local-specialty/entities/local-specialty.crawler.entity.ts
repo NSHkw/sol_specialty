@@ -1,4 +1,4 @@
-// src/local-specialty/entities/local-specialty.entity.ts
+// src/local-specialty/entities/local-specialty.crawler.entity.ts
 import {
   Column,
   CreateDateColumn,
@@ -50,7 +50,4 @@ export class LocalSpecialty {
 
   @DeleteDateColumn({ nullable: true })
   deleted_at?: Date;
-
-  @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.local_specialty)
-  store_products: StoreProduct[];
 }

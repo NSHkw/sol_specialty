@@ -1,5 +1,5 @@
-import { OrderItem } from 'src/order/entities/order-item.entity';
-import { User } from 'src/user/entities/user.entity';
+import { OrderItem } from './order-item.entity';
+import { User } from '../../user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,

@@ -1,7 +1,7 @@
-import { CartItem } from 'src/cart-item/entities/cart-item.entity';
-import { LocalSpecialty } from 'src/local-specialty/entities/local-specialty.entity';
-import { OrderItem } from 'src/order/entities/order-item.entity';
-import { Store } from 'src/store/entities/store.entity';
+import { CartItem } from '../../cart-item/entities/cart-item.entity';
+import { LocalSpecialty } from '../../local-specialty/entities/local-specialty.entity';
+import { OrderItem } from '../../order/entities/order-item.entity';
+import { Store } from '../../store/entities/store.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

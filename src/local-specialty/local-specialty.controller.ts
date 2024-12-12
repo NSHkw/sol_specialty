@@ -1,3 +1,4 @@
+// src/local-specialty/local-specialty.controller.ts
 import {
   Body,
   Controller,
@@ -11,12 +12,12 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { LocalSpecialtyService } from './local-specialty.service';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../common/decorators/roles.decorator';
 import { CreateLocalSpecialtyDto } from './dto/create-local-specialty.dto';
-import { User, UserRole } from 'src/user/entities/user.entity';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { User, UserRole } from '../user/entities/user.entity';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { Region } from './types/region.type';
 import { SearchLocalSpecialtyDto } from './dto/search-local-specialty.dto';
 import { ApiTags } from '@nestjs/swagger';
