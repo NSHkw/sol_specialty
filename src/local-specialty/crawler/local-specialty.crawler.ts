@@ -1,11 +1,11 @@
 // src/local-specialty/crawler/local-specialty.crawler.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LocalSpecialty } from '../entities/local-specialty.crawler.entity';
+import { CrawlLocalSpecialty } from '../entities/local-specialty.crawler.entity';
 import { Repository } from 'typeorm';
 import { Region } from '../types/region.type';
 import axios from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import { SpecialtySeason } from '../types/season.type';
 
 @Injectable()
@@ -24,11 +24,12 @@ export class LocalSpecialtyCrawler {
   };
 
   constructor(
-    @InjectRepository(LocalSpecialty) private localSpecialty: Repository<LocalSpecialty>,
+    @InjectRepository(CrawlLocalSpecialty) private localSpecialty: Repository<CrawlLocalSpecialty>,
   ) {}
 
   async crawlLocalData() {
     for (let i: number = 1; i <= 230; i++) {
+      // 228번 index는 존재X
       try {
         await this.crawlByIndex(i);
       } catch (error) {
@@ -38,25 +39,36 @@ export class LocalSpecialtyCrawler {
   }
 
   private async crawlByIndex(index: number) {
+    this.logger.log('poiru');
     try {
-      this.logger.log('크롤링 시작 ', index);
+      this.logger.log('크롤링 시작------------ ');
       const url = `http://www.traveli.co.kr/area/show/${index}`;
-      const response = await axios.get(url);
+
+      this.logger.log('poi');
+      const response = await axios.get(url, {
+        timeout: 5000,
+        headers: {
+          'User-Agent': 'Chrome/91.0.4472.124',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+          'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
+        },
+        validateStatus: function (status) {
+          return status >= 200 && status < 300;
+        },
+      });
+
       const $ = cheerio.load(response.data);
-      this.logger.log(url);
 
       // 지역 이름 설정 [강원도, 강릉시]
       const regionFullName: string = $('.top_area h3').text().trim().split(' ')[0];
 
       this.logger.log(regionFullName);
 
-      let region: Region;
-
+      let region = Region.GYEONGGI; // 기본값 설정
       for (const [key, value] of Object.entries(this.REGION_MAP)) {
         if (regionFullName.includes(key)) {
           region = value;
-        } else {
-          region = Region.GYEONGGI;
+          break; // 매칭되면 반복 중단
         }
       }
 
@@ -82,10 +94,23 @@ export class LocalSpecialtyCrawler {
       await Promise.all(
         specialties.map(async (specialty) => {
           const existing = await this.localSpecialty.findOne({
-            where: { name: specialty.name },
+            where: { name: specialty.name, region: specialty.region },
           });
 
-          if (!existing) {
+          if (existing) {
+            // 기존 데이터 업데이트
+            await this.localSpecialty.update(
+              { name: specialty.name, region: specialty.region },
+              {
+                description: specialty.description,
+                season_info: specialty.seasonInfo,
+                region: specialty.region,
+                image: specialty.imageUrl,
+              },
+            );
+            this.logger.log(`Updated specialty: ${specialty.name} from ${regionFullName}`);
+          } else {
+            // 새로운 데이터 저장
             const newSpecialty = this.localSpecialty.create({
               name: specialty.name,
               description: specialty.description,

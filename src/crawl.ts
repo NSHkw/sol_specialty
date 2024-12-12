@@ -1,7 +1,7 @@
 // src/crawl.ts
 import { Logger, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { LocalSpecialty } from './local-specialty/entities/local-specialty.crawler.entity';
+import { CrawlLocalSpecialty } from './local-specialty/entities/local-specialty.crawler.entity';
 import { LocalSpecialtyCrawler } from './local-specialty/crawler/local-specialty.crawler';
 import { Command, CommandRunner, CommandFactory } from 'nest-commander';
 import { NestFactory } from '@nestjs/core';
@@ -34,19 +34,19 @@ export class CrawlSpecialtyCommand extends CommandRunner {
       username: 'root',
       password: 'aaaa4321',
       database: 'localS',
-      entities: [LocalSpecialty],
+      entities: [CrawlLocalSpecialty],
       autoLoadEntities: true,
       synchronize: false,
       logging: true,
     }),
-    TypeOrmModule.forFeature([LocalSpecialty]),
+    TypeOrmModule.forFeature([CrawlLocalSpecialty]),
   ],
   providers: [LocalSpecialtyCrawler, CrawlSpecialtyCommand],
 })
 class CrawlerModule {}
 
 async function bootstrap() {
-  const app = await NestFactory.create(CrawlerModule, {
+  await NestFactory.create(CrawlerModule, {
     logger: ['log', 'error', 'warn', 'debug'], // 로깅 레벨 설정
   });
 
