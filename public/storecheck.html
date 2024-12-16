@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>상점 상세 조회</title>
     <style>
         body {
             margin: 0;
@@ -33,18 +33,6 @@
             border-radius: 5px;
         }
 
-        .correction {
-            margin-top: 15px;
-            font-size: 0.9rem;
-            color: rgba(162, 150, 150, 0.72);
-        }
-
-        .correction a {
-            color: #000;
-            font-weight: bold;
-            text-decoration: none;
-        }
-
         .container {
             display: flex;
             flex-direction: row;
@@ -69,11 +57,6 @@
             cursor: pointer;
         }
 
-        .menu-text.gray {
-            color: #E0DCDC;
-            font-size: 15px;
-        }
-
         .info-container {
             flex: 1;
             display: flex;
@@ -90,44 +73,6 @@
             margin: 10px 0;
             text-align: center;
             line-height: 30px;
-            /* 수직 중앙 정렬 */
-        }
-
-        .label {
-            text-align: center;
-            color: black;
-            font-size: 15px;
-            font-weight: 600;
-            margin: 5px 0;
-        }
-
-        .Modify {
-            width: 145px;
-            height: 29px;
-            text-align: center;
-            color: black;
-            font-size: 15px;
-            font-weight: 600;
-            margin: 20px 0;
-            cursor: pointer;
-        }
-
-        .menu-tab {
-            height: 59px;
-            color: black;
-            font-size: 32px;
-            font-weight: 400;
-            text-align: center;
-        }
-
-        @media (max-width: 768px) {
-            .menu-text {
-                font-size: 24px;
-            }
-
-            .nav a {
-                font-size: 1rem;
-            }
         }
     </style>
 </head>
@@ -142,80 +87,105 @@
         <a href="mypage.html">마이페이지</a>
         <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
     </div>
-
     <div class="container">
         <div class="Mypagebar">
             <div class="menu-text">
-                <a class="menu-text" href="mypage.html">내 정보</a>
-            </div>
-            <div class="menu-text">주문 목록</div>
-            <div class="menu-text">리뷰 목록</div>
-            <div class="menu-text">
-                <a class="menu-text" href="cash.html">캐쉬 충전</a>
+                <a class="menu-text" href="storemain.loginafter.html" id="storeView">상점 조회</a>
             </div>
             <div class="menu-text">
-                <a class="menu-text" href="rolechange.html">직업 변경</a>
+                <a class="menu-text" href="storeregistration.html">상점 등록</a>
             </div>
             <div class="menu-text">
-                <a class="menu-text gray" href="accountdelete.html">회원 탈퇴</a>
+                <a class="menu-text" href="storecheck.html">상점 확인</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="storedelete.html">상점 삭제</a>
             </div>
         </div>
 
         <div class="info-container">
-            <div class="label">금액</div>
-            <input type="text" id="cash" class="info-box Cashbox" placeholder="충전할 금액을 입력하세요">
+            <div class="label">상점 이름</div>
+            <div class="info-box" id="storeName"></div>
+            <div class="label">설명</div>
+            <div class="info-box" id="storeDescription"></div>
+            <div class="label">주소</div>
+            <div class="info-box" id="storeAddress"></div>
             <div class="correction">
-                <button id="updateButton">확인</button>
+                <a href="storecheck.correction.html">수정</a>
             </div>
         </div>
     </div>
+
     <script>
         function logout() {
             localStorage.removeItem('token'); // 토큰 삭제
             localStorage.removeItem('userId'); // 사용자 ID 삭제
             window.location.href = 'homepage.loginbefore.html'; // 로그인 페이지로 리다이렉트
         }
-    
-        // 로그아웃 버튼 클릭 시 logout 함수 호출
-        document.getElementById('logoutButton').addEventListener('click', function(event) {
+
+        document.getElementById('logoutButton').addEventListener('click', function (event) {
             event.preventDefault(); // 기본 링크 클릭 동작 방지
             logout(); // logout 함수 호출
         });
-        document.getElementById('updateButton').addEventListener('click', async () => {
-            const cash = document.getElementById('cash').value;
-    
-            // 입력된 금액이 비어있거나 숫자가 아닐 경우 처리
-            if (!cash || isNaN(cash) || cash <= 0) {
-                alert('유효한 금액을 입력하세요.');
+
+        async function fetchStoreDetails(storeId) {
+            try {
+                const response = await fetch(`/store/${storeId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('상점 정보를 가져오는 데 실패했습니다.');
+                }
+
+                const storeData = await response.json();
+
+                // storeData가 배열이므로 첫 번째 요소에 접근
+                const store = storeData[0];
+
+                // HTML 요소에 데이터 출력
+                document.getElementById('storeName').textContent = store.name || 'N/A';
+                document.getElementById('storeDescription').textContent = store.description || 'N/A';
+                document.getElementById('storeAddress').textContent = store.address || 'N/A';
+            } catch (error) {
+                console.error('Error fetching store details:', error);
+            }
+        }
+
+        // 페이지가 로드될 때 사용자 ID로 상점 ID 가져오기
+        async function fetchStoreId() {
+            const userId = localStorage.getItem('userId'); // 로컬 스토리지에서 사용자 ID 가져오기
+
+            if (!userId) {
+                console.error('사용자 ID가 로컬 스토리지에 없습니다.');
                 return;
             }
-    
+
             try {
-                const response = await fetch('/user/cash', {
-                    method: 'PATCH',
+                const response = await fetch(`/store/${userId}/storeid`, {
+                    method: 'GET',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
                     },
-                    body: JSON.stringify({ cash: Number(cash) }), // 숫자로 변환하여 전송
                 });
-    
+
                 if (!response.ok) {
-                    const errorMessage = await response.json();
-                    alert(errorMessage.message || '충전 실패');
-                    return;
+                    throw new Error('상점 ID를 가져오는 데 실패했습니다.');
                 }
-    
-                const result = await response.json();
-                alert(result.message); // 성공 메시지
-                // 필요시 페이지 리프레시 또는 다른 행동 추가
+
+                const { storeId } = await response.json(); // 상점 ID 가져오기
+                fetchStoreDetails(storeId); // 상점 ID로 상세 정보 조회
             } catch (error) {
-                console.error('Error during cash recharge:', error);
-                alert('충전 요청 중 오류가 발생했습니다.');
+                console.error('Error fetching store ID:', error);
             }
-        });
+        }
+
+        // 페이지가 로드될 때 사용자 ID로 상점 ID 가져오기
+        window.onload = fetchStoreId;
     </script>
- 
 </body>
 
 </html>

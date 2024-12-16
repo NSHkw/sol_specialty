@@ -36,8 +36,17 @@
       }
 
       #korea-map {
-        width: 65%;
-        height: calc(100vh - 120px);
+        position: relative;
+        z-index: 1;
+      }
+
+      #korea-map path {
+        transition: all 0.3s ease;
+        transform-origin: center center;
+      }
+
+      #korea-map path:hover {
+        cursor: pointer;
       }
 
       .region-list {
@@ -123,15 +132,15 @@
           {
             name: 'North Chungcheong',
             korName: '충청북도',
-            iconColor: '#f39c12',
+            iconColor: '#f1c40f',
             mapColor: '#f1c40f',
-            icon: '🌄',
+            icon: '⛰️',
             description: '내륙 중심의 교통과 물류의 요충지입니다.',
           },
           {
             name: 'South Chungcheong',
             korName: '충청남도',
-            iconColor: '#9b59b6',
+            iconColor: '#27ae60',
             mapColor: '#27ae60',
             icon: '🌊',
             description: '서해안의 수산업과 농업이 발달한 지역입니다.',
@@ -139,7 +148,7 @@
           {
             name: 'North Jeolla',
             korName: '전라북도',
-            iconColor: '#2c3e50',
+            iconColor: '#9b59b6',
             mapColor: '#9b59b6',
             icon: '🍚',
             description: '한국 전통 음식의 본고장입니다.',
@@ -147,7 +156,7 @@
           {
             name: 'South Jeolla',
             korName: '전라남도',
-            iconColor: '#8e44ad',
+            iconColor: '#e67e22',
             mapColor: '#e67e22',
             icon: '🌾',
             description: '비옥한 평야와 청정 해역을 보유한 지역입니다.',
@@ -155,45 +164,45 @@
           {
             name: 'North Gyeongsang',
             korName: '경상북도',
-            iconColor: '#16a085',
+            iconColor: '#1abc9c',
             mapColor: '#1abc9c',
-            icon: '🗻',
+            icon: '⛰️',
             description: '한국의 전통문화와 역사가 살아있는 곳입니다.',
           },
           {
             name: 'South Gyeongsang',
             korName: '경상남도',
-            iconColor: '#27ae60',
+            iconColor: '#d35400',
             mapColor: '#d35400',
-            icon: '🏖️',
+            icon: '🏠',
             description: '항만 물류와 해양 관광의 중심지입니다.',
           },
+
           {
             name: 'Jeju',
             korName: '제주도',
             iconColor: '#95a5a6',
-            mapColor: '#7f8c8d',
+            mapColor: '#95a5a6',
             icon: '🌴',
             description: '아름다운 자연과 독특한 문화가 있는 관광의 섬입니다.',
           },
         ];
 
-        // 좌우 지역 목록 생성
         const leftList = document.querySelector('.region-list.left');
         const rightList = document.querySelector('.region-list.right');
 
         regions.forEach((region, index) => {
           const regionElement = `
-    <div class="region-item">
-        <div class="region-icon" style="background-color: ${region.iconColor}">
-            ${region.icon}
-        </div>
-        <div class="region-info">
-            <div class="region-name">${region.korName}</div>
-            <div class="region-desc">${region.description}</div>
-        </div>
-    </div>
-`;
+            <div class="region-item" data-region="${region.name}">
+              <div class="region-icon" style="background-color: ${region.iconColor}">
+                ${region.icon}
+              </div>
+              <div class="region-info">
+                <div class="region-name">${region.korName}</div>
+                <div class="region-desc">${region.description}</div>
+              </div>
+            </div>
+          `;
 
           if (index < Math.ceil(regions.length / 2)) {
             leftList.innerHTML += regionElement;
@@ -202,7 +211,6 @@
           }
         });
 
-        // SVG 지도 색상 설정
         const svgObject = document.getElementById('korea-map');
         svgObject.addEventListener('load', function () {
           const svgDoc = svgObject.contentDocument;
@@ -215,14 +223,33 @@
               path.style.stroke = '#FFFFFF';
               path.style.strokeWidth = '1';
 
-              // 호버 효과
+              // 지도 호버 효과
               path.addEventListener('mouseover', () => {
-                path.style.opacity = '0.5';
+                path.style.opacity = '0.7';
               });
               path.addEventListener('mouseout', () => {
                 path.style.opacity = '1';
               });
             }
+          });
+
+          // 지역 아이템 호버 효과
+          document.querySelectorAll('.region-item').forEach(item => {
+            const regionName = item.getAttribute('data-region');
+            
+            item.addEventListener('mouseover', function() {
+              const path = svgDoc.querySelector(`path[title="${regionName}"]`);
+              if (path) {
+                path.style.opacity = '0.7';
+              }
+            });
+            
+            item.addEventListener('mouseout', function() {
+              const path = svgDoc.querySelector(`path[title="${regionName}"]`);
+              if (path) {
+                path.style.opacity = '1';
+              }
+            });
           });
         });
       });

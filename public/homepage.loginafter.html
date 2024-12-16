@@ -126,16 +126,16 @@
     </style>
 </head>
 <body>
-    <nav class="nav">
+    <div class="nav">
         <img class="image" src="https://via.placeholder.com/1440x556" />
         <a href="homepage.loginafter.html">Home</a>
-        <a href="#store">상점</a>
-        <a href="#local">특산물</a>
+        <a href="storemain.loginafter.html">상점</a>
+        <a href="local.loginafter.html">특산물</a>
         <a href="#orders">주문</a>
-        <a href="#products">상품 관리</a>
+        <a href="goods.list.loginafter.html">상품 관리</a>
         <a href="mypage.html">마이페이지</a>
-        <a href="#" id="logoutButton">로그아웃</a>
-    </nav>
+        <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
+    </div>
     <script>
         function logout() {
             localStorage.removeItem('token'); // 토큰 삭제
