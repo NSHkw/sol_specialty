@@ -53,17 +53,7 @@ export class LocalSpecialtyCrawler {
       const url = `http://www.traveli.co.kr/area/show/${index}`;
 
       this.logger.log('poi');
-      const response = await axios.get(url, {
-        timeout: 5000,
-        headers: {
-          'User-Agent': 'Chrome/91.0.4472.124',
-          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-        },
-        validateStatus: function (status) {
-          return status >= 200 && status < 300;
-        },
-      });
+      const response = await axios.get(url);
 
       const $ = cheerio.load(response.data);
 

@@ -45,15 +45,6 @@ export class LocalSpecialty {
   @Column({ nullable: true })
   image?: string;
 
-  @CreateDateColumn()
-  created_at: Date;
-
-  @UpdateDateColumn({ nullable: true })
-  updated_at?: Date;
-
-  @DeleteDateColumn({ nullable: true })
-  deleted_at?: Date;
-
   @OneToMany(() => StoreProduct, (storeProduct) => storeProduct.local_specialty)
   store_products: StoreProduct[];
 }
