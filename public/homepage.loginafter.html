@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #fff;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+            margin: 0;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 75px); /* 헤더 높이 제외 */
+        }
+
+        .form-container input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            background: #D9D9D9;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .form-container button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 200px;
+            background: #51FF00;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .form-container button:hover {
+            background: #45e000;
+        }
+
+        .hint {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: rgba(162, 150, 150, 0.72);
+        }
+
+        .hint a {
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        /* 추가된 스타일 */
+        .container {
+            width: 100%; /* 전체 너비 */
+            height: 1024px;
+            position: relative;
+        }
+
+        .image {
+            width: 100%; /* 전체 너비 */
+            height: 556px;
+            position: absolute;
+            left: 0;
+            top: 234px;
+        }
+
+        .header {
+            width: 100%; /* 전체 너비 */
+            height: 75px;
+            position: absolute;
+            top: 0;
+            background: #51FF00;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .button {
+            height: 59px;
+            background: #51FF00;
+            color: black;
+            font-size: 32px;
+            font-family: Inter, sans-serif;
+            font-weight: 400;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex: 1; /* 버튼이 균등하게 배치되도록 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+        }
+
+        .button:hover {
+            background: #4CAF50; /* 버튼 호버 색상 */
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <img class="image" src="https://via.placeholder.com/1440x556" />
+        <a href="homepage.loginafter.html">Home</a>
+        <a href="#store">상점</a>
+        <a href="#local">특산물</a>
+        <a href="#orders">주문</a>
+        <a href="#products">상품 관리</a>
+        <a href="mypage.html">마이페이지</a>
+        <a href="#" id="logoutButton">로그아웃</a>
+    </nav>
+    <script>
+        function logout() {
+            localStorage.removeItem('token'); // 토큰 삭제
+            localStorage.removeItem('userId'); // 사용자 ID 삭제
+            window.location.href = 'homepage.loginbefore.html'; // 로그인 페이지로 리다이렉트
+        }
+    
+        // 로그아웃 버튼 클릭 시 logout 함수 호출
+        document.getElementById('logoutButton').addEventListener('click', function(event) {
+            event.preventDefault(); // 기본 링크 클릭 동작 방지
+            logout(); // logout 함수 호출
+        });
+    </script>
+</body>
+</html>
