@@ -33,54 +33,6 @@ export class LocalSpecialtyController {
   constructor(private readonly localSpecialtyService: LocalSpecialtyService) {}
 
   /**
-   * 특산품 생성
-   * @param user 유저 정보
-   * @param createDto 특산품 생성 정보
-   * @returns 특산품 생성 결과
-   * UseGuard 데코레이터가 있는 라우트는 메소드 실행 전 JWT 토큰 검증을 거친다
-   */
-  @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.CREATED)
-  create(@GetUser() user: User, @Body() createDto: CreateLocalSpecialtyDto) {
-    return this.localSpecialtyService.create(user, createDto);
-  }
-
-  /**
-   * 특산품 삭제
-   * @param user 유저 정보
-   * @param id 특산품 id
-   * @returns 특산품 삭제 결과
-   */
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
-  delete(@GetUser() user: User, @Param('id') id: number) {
-    return this.localSpecialtyService.delete(user, id);
-  }
-
-  /**
-   * 특산품 수정
-   * @param user 유저 정보
-   * @param id 특산품 id
-   * @param updateDto 특산품 수정 정보
-   * @returns 특산품 수정 결과
-   */
-  @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.OK)
-  update(
-    @GetUser() user: User,
-    @Param('id') id: number,
-    @Body() updateDto: UpdateLocalSpecialtyDto,
-  ) {
-    return this.localSpecialtyService.update(user, id, updateDto);
-  }
-
-  /**
    * 특산품 전체 조회
    * @returns 특산품 전체 조회 결과
    */

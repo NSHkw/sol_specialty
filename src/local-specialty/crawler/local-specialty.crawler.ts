@@ -12,6 +12,14 @@ import { SpecialtySeason } from '../types/season.type';
 export class LocalSpecialtyCrawler {
   private readonly logger = new Logger(LocalSpecialtyCrawler.name);
   private readonly REGION_MAP = {
+    서울특별시: Region.SEOUL,
+    부산광역시: Region.BUSAN,
+    대구광역시: Region.DAEGU,
+    인천광역시: Region.INCHEON,
+    광주광역시: Region.GWANGJU,
+    대전광역시: Region.DAEJUN,
+    울산광역시: Region.ULSAN,
+    세종특별자치시: Region.SEJONG,
     강원도: Region.GANGWON,
     경기도: Region.GYEONGGI,
     충청북도: Region.CHUNGBUK,
@@ -20,7 +28,7 @@ export class LocalSpecialtyCrawler {
     전라남도: Region.JEONNAM,
     경상북도: Region.GYEONGBUK,
     경상남도: Region.GYEONGNAM,
-    제주도: Region.JEJU,
+    제주특별자치도: Region.JEJU,
   };
 
   constructor(
@@ -45,17 +53,7 @@ export class LocalSpecialtyCrawler {
       const url = `http://www.traveli.co.kr/area/show/${index}`;
 
       this.logger.log('poi');
-      const response = await axios.get(url, {
-        timeout: 5000,
-        headers: {
-          'User-Agent': 'Chrome/91.0.4472.124',
-          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-          'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7',
-        },
-        validateStatus: function (status) {
-          return status >= 200 && status < 300;
-        },
-      });
+      const response = await axios.get(url);
 
       const $ = cheerio.load(response.data);
 
