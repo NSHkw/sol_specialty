@@ -1,13 +1,5 @@
 // src/local-specialty/entities/local-specialty.entity.ts
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Region } from '../types/region.type';
 import { StoreProduct } from '../../store-product/entities/store-product.entity';
 import { SpecialtySeason } from '../types/season.type';
