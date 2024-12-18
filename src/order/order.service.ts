@@ -1,3 +1,4 @@
+// src/order/order.service.ts
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '../user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -217,7 +218,7 @@ export class OrderService {
   }
 
   // 유저의 모든 주문 조회하기
-  async findAll(user: User) {
+  async findAllOrder(user: User) {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
@@ -228,7 +229,7 @@ export class OrderService {
   }
 
   // 주문 하나 조회하기
-  async findOne(user: User, id: number) {
+  async findOneDetailOrder(user: User, id: number) {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
@@ -249,16 +250,16 @@ export class OrderService {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
-    const order = await this.findOne(user, id);
+    const order = await this.findOneDetailOrder(user, id);
     return order.status;
   }
 
   // 주문 취소하기
-  async cancel(user: User, id: number) {
+  async cancelOrder(user: User, id: number) {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
-    const order = await this.findOne(user, id);
+    const order = await this.findOneDetailOrder(user, id);
 
     if (
       order.status !== ShipStatus.ORDER_COMPLETED &&
@@ -288,7 +289,7 @@ export class OrderService {
 
         // 장바구니 주문이었던 경우에만 장바구니에 다시 추가
         if (order.order_type === OrderType.CART) {
-          await this.cartItemService.create(user, item.store_product.store_id, {
+          await this.cartItemService.putInCart(user, item.store_product.store_id, {
             store_product_id: item.store_product_id,
             quantity: item.quantity,
           });

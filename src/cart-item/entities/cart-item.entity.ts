@@ -1,3 +1,4 @@
+// src/cart-item/entities/cart-item.entity.ts
 import { StoreProduct } from '../../store-product/entities/store-product.entity';
 import { User } from '../../user/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
