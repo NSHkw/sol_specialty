@@ -1,4 +1,4 @@
-export type StoreServiceResponse<T = void> = {
+export type StoreResponse<T = void> = {
   message: string;
   data?: T;
 };

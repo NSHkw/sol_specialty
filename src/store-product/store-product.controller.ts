@@ -19,6 +19,8 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { User, UserRole } from '../user/entities/user.entity';
 import { Roles } from '../common/decorators/roles.decorator';
 import { GetUser } from '../common/decorators/get-user.decorator';
+import { StoreProduct } from './entities/store-product.entity';
+import { StoreProductResponse } from './types/store-product.type';
 
 @ApiTags('StoreProduct')
 @ApiBearerAuth('access-token')
@@ -37,20 +39,27 @@ export class StoreProductController {
     @GetUser() user: User,
     @Param('store_id') store_id: number,
     @Body() createStoreProductDto: CreateStoreProductDto,
-  ) {
-    return this.storeProductService.create(user, store_id, createStoreProductDto);
+  ): Promise<StoreProductResponse<StoreProduct>> {
+    return this.storeProductService.createStoreProductInStore(
+      user,
+      store_id,
+      createStoreProductDto,
+    );
   }
 
   // 상점 내 상품들 조회
   @Get()
-  async findAll(@Param('store_id') store_id: number) {
-    return this.storeProductService.findAll(store_id);
+  async findAllInStore(@Param('store_id') store_id: number): Promise<StoreProduct[]> {
+    return this.storeProductService.findAllInStore(store_id);
   }
 
   // 상점 내 상품 하나 상세 조회
   @Get(':product_id')
-  async findOne(@Param('product_id') product_id: number, @Param('store_id') store_id: number) {
-    return this.storeProductService.findOne(product_id, store_id);
+  async findOneProductInStore(
+    @Param('product_id') product_id: number,
+    @Param('store_id') store_id: number,
+  ): Promise<StoreProduct> {
+    return this.storeProductService.findOneProductInStore(product_id, store_id);
   }
 
   // 상점 내 상품 수정
@@ -58,13 +67,18 @@ export class StoreProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @HttpCode(HttpStatus.OK)
-  async update(
+  async updateProductInfoInStore(
     @GetUser() user: User,
     @Param('product_id') product_id: number,
     @Param('store_id') store_id: number,
     @Body() updateStoreProductDto: UpdateStoreProductDto,
-  ) {
-    return this.storeProductService.update(user, product_id, store_id, updateStoreProductDto);
+  ): Promise<StoreProductResponse<StoreProduct>> {
+    return this.storeProductService.updateProductInfoInStore(
+      user,
+      product_id,
+      store_id,
+      updateStoreProductDto,
+    );
   }
 
   // 상점 내 상품 삭제
@@ -72,11 +86,11 @@ export class StoreProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @HttpCode(HttpStatus.OK)
-  asyncdelete(
+  async delete(
     @Param('product_id') product_id: number,
     @Param('store_id') store_id: number,
     @GetUser() user: User,
-  ) {
-    return this.storeProductService.delete(product_id, store_id, user);
+  ): Promise<StoreProductResponse<StoreProduct>> {
+    return this.storeProductService.deleteStoreProductInStore(product_id, store_id, user);
   }
 }

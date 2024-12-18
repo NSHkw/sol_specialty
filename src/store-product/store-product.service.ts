@@ -1,43 +1,21 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+// src/store-product/store-product.service.ts
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStoreProductDto } from './dto/create-store-product.dto';
 import { UpdateStoreProductDto } from './dto/update-store-product.dto';
 import { User } from '../user/entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { StoreProduct } from './entities/store-product.entity';
-import { Repository } from 'typeorm';
-import { Store } from '../store/entities/store.entity';
-import { LocalSpecialty } from '../local-specialty/entities/local-specialty.entity';
 import { AuthUtils } from '../common/utils/auth.utils';
+import { StoreProductInterface } from './interfaces/store-product.interface';
+import { StoreProductRepository } from './store-product.repository';
+import { StoreProductResponse } from './types/store-product.type';
+import { StoreProductValidator } from './store-product.validator';
 
 @Injectable()
-export class StoreProductService {
+export class StoreProductService implements StoreProductInterface {
   constructor(
-    @InjectRepository(StoreProduct)
-    private readonly storeProductRepository: Repository<StoreProduct>,
-    @InjectRepository(Store)
-    private readonly storeRepository: Repository<Store>,
-    @InjectRepository(LocalSpecialty)
-    private readonly localSpecialtyRepository: Repository<LocalSpecialty>,
+    private readonly storeProductRepository: StoreProductRepository,
+    private readonly storeProductValidator: StoreProductValidator,
   ) {}
-
-  /**
-   * 상점 소유자 검증
-   * @param store_id
-   * @param user
-   * @returns
-   */
-  private async validateStoreOwner(store_id: number, user: User) {
-    AuthUtils.validateLogin(user);
-
-    const store = await this.storeRepository.findOne({
-      where: { id: store_id, user_id: user.id },
-    });
-    if (!store) {
-      throw new ForbiddenException('상점에 대한 권한 X');
-    }
-
-    return store;
-  }
 
   /**
    * 상점 내 상품 등록
@@ -46,26 +24,27 @@ export class StoreProductService {
    * @param createStoreProductDto
    * @returns
    */
-  async create(user: User, store_id: number, createStoreProductDto: CreateStoreProductDto) {
+  async createStoreProductInStore(
+    user: User,
+    store_id: number,
+    createStoreProductDto: CreateStoreProductDto,
+  ): Promise<StoreProductResponse<StoreProduct>> {
     AuthUtils.validateLogin(user);
 
-    await this.validateStoreOwner(store_id, user);
-
     const { local_specialty_id, stock } = createStoreProductDto;
-    const localSpecialty = await this.localSpecialtyRepository.findOne({
-      where: { id: local_specialty_id },
-    });
-    if (!localSpecialty) {
-      throw new NotFoundException('지역 특산품 존재 X');
-    }
 
-    const newStoreProduct = this.storeProductRepository.save({
+    await this.storeProductValidator.validateStoreProduct(store_id, user.id, local_specialty_id);
+
+    const product = await this.storeProductRepository.create({
       ...createStoreProductDto,
       store_id,
-      sold_out: stock > 0 ? false : true,
+      sold_out: !stock || stock <= 0,
     });
 
-    return newStoreProduct;
+    return {
+      message: '상품 등록',
+      data: product,
+    };
   }
 
   /**
@@ -73,19 +52,8 @@ export class StoreProductService {
    * @param store_id
    * @returns
    */
-  async findAll(store_id: number) {
-    return await this.storeProductRepository.find({
-      where: { store_id },
-      relations: ['local_specialty'],
-      select: {
-        id: true,
-        product_name: true,
-        price: true,
-        grade: true,
-        type: true,
-        local_specialty: { id: true, name: true },
-      },
-    });
+  async findAllInStore(store_id: number): Promise<StoreProduct[]> {
+    return this.storeProductRepository.findAllProductByStoreId(store_id);
   }
 
   /**
@@ -94,11 +62,8 @@ export class StoreProductService {
    * @param store_id
    * @returns
    */
-  async findOne(product_id: number, store_id: number) {
-    const product = await this.storeProductRepository.findOne({
-      where: { id: product_id, store_id },
-      relations: ['local_specialty'],
-    });
+  async findOneProductInStore(product_id: number, store_id: number): Promise<StoreProduct> {
+    const product = await this.storeProductRepository.findOne(product_id, store_id);
 
     if (!product) {
       throw new NotFoundException('상점 내 상품 존재 X');
@@ -115,35 +80,27 @@ export class StoreProductService {
    * @param updateStoreProductDto
    * @returns
    */
-  async update(
+  async updateProductInfoInStore(
     user: User,
     product_id: number,
     store_id: number,
     updateStoreProductDto: UpdateStoreProductDto,
-  ) {
+  ): Promise<StoreProductResponse<StoreProduct>> {
     AuthUtils.validateLogin(user);
 
-    await this.validateStoreOwner(store_id, user);
+    await this.storeProductValidator.validateStoreProduct(store_id, user.id, product_id);
 
+    const product = await this.findOneProductInStore(product_id, store_id);
     const { stock } = updateStoreProductDto;
 
-    const product = await this.storeProductRepository.findOne({
-      where: { id: product_id, store_id },
+    await this.storeProductRepository.update(product_id, {
+      ...updateStoreProductDto,
+      sold_out: stock !== undefined ? stock <= 0 : product.sold_out,
     });
 
-    if (!product) {
-      throw new NotFoundException('상품 존재 X');
-    }
+    const updatedProduct = await this.findOneProductInStore(product_id, store_id);
 
-    await this.storeProductRepository.update(
-      { id: product_id },
-      {
-        ...updateStoreProductDto,
-        sold_out: stock !== undefined ? (stock > 0 ? false : true) : product.sold_out,
-      },
-    );
-
-    return { message: '상품 수정 완료', product_name: product.product_name };
+    return { message: `${product.product_name}상품 수정 완료`, data: updatedProduct };
   }
 
   /**
@@ -153,21 +110,19 @@ export class StoreProductService {
    * @param user
    * @returns
    */
-  async delete(product_id: number, store_id: number, user: User) {
+  async deleteStoreProductInStore(
+    product_id: number,
+    store_id: number,
+    user: User,
+  ): Promise<StoreProductResponse<StoreProduct>> {
     AuthUtils.validateLogin(user);
 
-    await this.validateStoreOwner(store_id, user);
+    await this.storeProductValidator.validateStoreProduct(store_id, user.id, product_id);
 
-    const product = await this.storeProductRepository.findOne({
-      where: { id: product_id, store_id },
-    });
+    const product = await this.findOneProductInStore(product_id, store_id);
 
-    if (!product) {
-      throw new NotFoundException('상품 존재 X');
-    }
+    await this.storeProductRepository.delete(product);
 
-    await this.storeProductRepository.remove(product);
-
-    return { message: '상품 삭제 완료' };
+    return { message: `${product.product_name} 상품 삭제 완료`, data: product };
   }
 }

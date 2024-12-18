@@ -26,6 +26,6 @@ import { StoreValidator } from './store.validator';
     },
     StoreValidator,
   ],
-  exports: [StoreService, StoreRepository, TypeOrmModule],
+  exports: [StoreService, StoreRepository, TypeOrmModule, StoreValidator],
 })
 export class StoreModule {}

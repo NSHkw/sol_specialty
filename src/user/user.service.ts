@@ -18,9 +18,10 @@ import { LoginDto } from './dto/login.dto';
 import { LoginSuccessResponse, UserResponse } from './types/user.type';
 import { UserRepository } from './user.repository';
 import { UserValidator } from './user.validator';
+import { UserInterface } from './interfaces/user.interface';
 
 @Injectable()
-export class UserService {
+export class UserService implements UserInterface {
   constructor(
     //TypeORM의 @InjectRepository 데코레이터는 특정 엔티티(User)의 데이터베이스 작업을 처리하는 Repository를 주입하는 데 사용
     //Repository 데이터베이스에서 특정 엔티티(User)를 관리하기 위한 메서드들이 포함
@@ -51,7 +52,7 @@ export class UserService {
       phone,
       role,
     });
-    //db 저장
+
     return {
       message: '회원가입 완료',
       data: this.excludePasswordInUserData(user),

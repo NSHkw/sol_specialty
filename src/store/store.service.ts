@@ -1,29 +1,19 @@
 // src/store/store.service.ts
 import { StoreValidator } from './store.validator';
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
 import { Store } from './entities/store.entity';
 import { User } from '../user/entities/user.entity';
 import { SearchStoreDto } from './dto/search-store.dto';
 import { AuthUtils } from '../common/utils/auth.utils';
-import { StoreServiceInterface } from './interfaces/store.interface';
+import { StoreInterface } from './interfaces/store.interface';
 import { StoreRepository } from './store.repository';
-import {
-  SearchResult,
-  StoreBaseInfo,
-  StoreDetailInfo,
-  StoreServiceResponse,
-} from './types/store.type';
+import { SearchResult, StoreBaseInfo, StoreDetailInfo, StoreResponse } from './types/store.type';
 
 // TODO: 상점 판매량 확인 함수 구현
 @Injectable()
-export class StoreService implements StoreServiceInterface {
+export class StoreService implements StoreInterface {
   constructor(
     private readonly storeRepository: StoreRepository,
     private readonly storeValidator: StoreValidator,
@@ -32,10 +22,7 @@ export class StoreService implements StoreServiceInterface {
   // 상점 생성, 수정, 삭제, 판매량 확인, 모든 상점 조회, 특정 상점 상세 조회, 상점 검색
 
   // 상점 생성
-  async createStore(
-    user: User,
-    createStoreDto: CreateStoreDto,
-  ): Promise<StoreServiceResponse<Store>> {
+  async createStore(user: User, createStoreDto: CreateStoreDto): Promise<StoreResponse<Store>> {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
@@ -56,11 +43,11 @@ export class StoreService implements StoreServiceInterface {
   }
 
   // 상점 정보 수정
-  async updateStore(
+  async updateStoreInfo(
     store_id: number,
     user: User,
     updateStoreDto: UpdateStoreDto,
-  ): Promise<StoreServiceResponse> {
+  ): Promise<StoreResponse> {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
@@ -79,7 +66,7 @@ export class StoreService implements StoreServiceInterface {
   }
 
   // 상점 삭제
-  async deleteStore(store_id: number, user: User): Promise<StoreServiceResponse> {
+  async deleteStore(store_id: number, user: User): Promise<StoreResponse> {
     // 로그인 체크
     AuthUtils.validateLogin(user);
 
@@ -89,9 +76,6 @@ export class StoreService implements StoreServiceInterface {
 
     return { message: `${store.name} 삭제` };
   }
-
-  // 상점 판매량 확인
-  async checkStoreSales(id: number) {}
 
   async findStoreByUserId(user_id: number): Promise<Store> {
     const store = await this.storeRepository.findByUserId(user_id);
@@ -117,7 +101,7 @@ export class StoreService implements StoreServiceInterface {
 
   // 특정 상점 상세 조회
   // 특정 상점 상세 조회 시 상점 이름, 상점 소개, 상점에서 판매하는 모든 특산품, 리뷰 평균 점수, 주소, 연락처, 이미지, 위도, 경도를 보여줘야 함
-  async findStoreById(id: number): Promise<StoreDetailInfo> {
+  async findStoreByStoreId(id: number): Promise<StoreDetailInfo> {
     const store = await this.storeRepository.findStoreDetailById(id);
 
     if (!store) {
@@ -128,7 +112,7 @@ export class StoreService implements StoreServiceInterface {
   }
 
   // 상점 검색 (상점 이름 or 특산품 이름으로 검색)
-  async search(searchDto: SearchStoreDto): Promise<SearchResult> {
+  async searchStore(searchDto: SearchStoreDto): Promise<SearchResult> {
     const page = searchDto.page || 1;
     const limit = searchDto.limit || 10;
     const { keyword } = searchDto;
