@@ -3,9 +3,9 @@ import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { User } from 'src/user/entities/user.entity';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GetUser } from '../common/decorators/get-user.decorator';
+import { User } from '../user/entities/user.entity';
 
 @ApiTags('Review')
 @ApiBearerAuth('access-token')

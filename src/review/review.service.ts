@@ -1,12 +1,12 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Review } from './entities/review.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Store } from 'src/store/entities/store.entity';
-import { AuthUtils } from 'src/common/utils/auth.utils';
+import { Store } from '../store/entities/store.entity';
+import { AuthUtils } from '../common/utils/auth.utils';
 
 @Injectable()
 export class ReviewService {
@@ -58,15 +58,13 @@ export class ReviewService {
 
     const { store_id, rating, content } = createReviewDto;
 
-    // 상점 존재 예외처리와 리뷰 존재 예외처리를 Promise.all로 병렬 처리 가능
-    const [existingStore, existingReview] = await Promise.all([
-      this.storeRepository.findOne({
-        where: { id: store_id },
-      }),
-      this.reviewRepository.findOne({
-        where: { user_id: user.id, store_id, deleted_at: null },
-      }),
-    ]);
+    const existingStore = await this.storeRepository.findOne({
+      where: { id: store_id },
+    });
+
+    const existingReview = await this.reviewRepository.findOne({
+      where: { user_id: user.id, store_id, deleted_at: null },
+    });
 
     if (!existingStore) {
       throw new NotFoundException('존재하지 않는 상점');

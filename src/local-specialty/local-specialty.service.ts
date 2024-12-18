@@ -5,7 +5,8 @@ import { Like, Repository } from 'typeorm';
 import { Region } from './types/region.type';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SearchLocalSpecialtyDto } from './dto/search-local-specialty.dto';
-import { FindSpecialtyOptions, SearchConditions } from './types/local-specialty.service.type';
+import { FindSpecialtyOptions, SearchConditions } from './types/local-specialty.type';
+import { LocalSpecialtyInterface } from './interfaces/local-specialty.interface';
 
 const SPECIALTY_SELECT_FIELDS = {
   DEFAULT: {
@@ -13,7 +14,6 @@ const SPECIALTY_SELECT_FIELDS = {
     name: true,
     season_info: true,
     region: true,
-    image: true,
   },
   DETAIL: {
     id: true,
@@ -21,13 +21,12 @@ const SPECIALTY_SELECT_FIELDS = {
     description: true,
     season_info: true,
     region: true,
-    image: true,
   },
 } as const;
 
 // 생성, 삭제, 전체 조회, 지역별 조회, id로 조회, 검색
 @Injectable()
-export class LocalSpecialtyService {
+export class LocalSpecialtyService implements LocalSpecialtyInterface {
   constructor(
     @InjectRepository(LocalSpecialty)
     private readonly localSpecialtyRepository: Repository<LocalSpecialty>,

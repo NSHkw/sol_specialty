@@ -1,9 +1,10 @@
+// src/common/utils/auth.util.ts
 import { UnauthorizedException } from '@nestjs/common';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 
 export class AuthUtils {
   /**
-   * 로그인 상태 확인
+   * 로그인 여부 확인
    * @param user 유저 객체
    * @throws UnauthorizedException 로그인하지 않은 경우
    */
@@ -20,7 +21,6 @@ export class AuthUtils {
    * @throws UnauthorizedException 권한이 없는 경우
    */
   static validateResourceOwner(resourceUserId: number, currentUser: User): void {
-    // 리소스 소유자와 현재 로그인한 유저가 다른 경우 (리뷰 삭제, 수정 관련에 쓰임)
     if (resourceUserId !== currentUser.id) {
       throw new UnauthorizedException('해당 리소스에 대한 권한이 없습니다.');
     }

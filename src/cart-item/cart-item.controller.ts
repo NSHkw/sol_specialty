@@ -2,12 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@n
 import { CartItemService } from './cart-item.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from 'src/user/entities/user.entity';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../user/entities/user.entity';
+import { GetUser } from '../common/decorators/get-user.decorator';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { CartItem } from './entities/cart-item.entity';
-import { CartItemResponse } from './types/cart-item.service.type';
+import { CartItemResponse } from './types/cart-item.type';
 
 @ApiTags('CartItem')
 @ApiBearerAuth('access-token')
@@ -23,7 +23,7 @@ export class CartItemController {
     @Param('store_id') store_id: number,
     @Body() createCartItemDto: CreateCartItemDto,
   ): Promise<CartItem> {
-    return this.cartItemService.create(user, store_id, createCartItemDto);
+    return this.cartItemService.putInCart(user, store_id, createCartItemDto);
   }
 
   // 장바구니 모든 물품 조회하기
