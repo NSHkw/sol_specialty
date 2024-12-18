@@ -35,7 +35,7 @@ import { User } from '../user/entities/user.entity';
       inject: [ConfigService],
       // imports: [ConfigModule],
     }),
-    forwardRef(() => UserModule), // 추가!
+    forwardRef(() => UserModule),
     forwardRef(() => StoreModule),
     TypeOrmModule.forFeature([User]),
   ],
