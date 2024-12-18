@@ -1,19 +1,13 @@
-import {
-  ConflictException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStoreProductDto } from './dto/create-store-product.dto';
 import { UpdateStoreProductDto } from './dto/update-store-product.dto';
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../user/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StoreProduct } from './entities/store-product.entity';
 import { Repository } from 'typeorm';
-import { Store } from 'src/store/entities/store.entity';
-import { LocalSpecialty } from 'src/local-specialty/entities/local-specialty.entity';
-import { AuthUtils } from 'src/common/utils/auth.utils';
+import { Store } from '../store/entities/store.entity';
+import { LocalSpecialty } from '../local-specialty/entities/local-specialty.entity';
+import { AuthUtils } from '../common/utils/auth.utils';
 
 @Injectable()
 export class StoreProductService {
@@ -35,7 +29,6 @@ export class StoreProductService {
   private async validateStoreOwner(store_id: number, user: User) {
     AuthUtils.validateLogin(user);
 
-    // store 테이블에서 store_id와 user_id가 일치한 것을 가져오는 것
     const store = await this.storeRepository.findOne({
       where: { id: store_id, user_id: user.id },
     });
@@ -147,7 +140,6 @@ export class StoreProductService {
       {
         ...updateStoreProductDto,
         sold_out: stock !== undefined ? (stock > 0 ? false : true) : product.sold_out,
-        // 재고가 비었을 경우 sold_out을 업데이트
       },
     );
 

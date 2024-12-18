@@ -1,14 +1,15 @@
-import { HttpCode, HttpStatus, Query } from '@nestjs/common';
+// src/store/store.controller.ts
+import { HttpCode, HttpStatus } from '@nestjs/common';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { User, UserRole } from 'src/user/entities/user.entity';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { User, UserRole } from '../user/entities/user.entity';
+import { Roles } from '../common/decorators/roles.decorator';
+import { GetUser } from '../common/decorators/get-user.decorator';
 import { SearchStoreDto } from './dto/search-store.dto';
 
 @ApiTags('Store')
@@ -26,6 +27,14 @@ export class StoreController {
   @HttpCode(HttpStatus.CREATED)
   async create(@GetUser() user: User, @Body() createStoreDto: CreateStoreDto) {
     return this.storeService.createStore(user, createStoreDto);
+  }
+
+  // 사용자 ID로 상점 ID 반환
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get(':userId/storeid')
+  async getStoreByUserId(@Param('userId') userId: number) {
+    const store = await this.storeService.findStoreByUserId(userId);
+    return { storeId: store.id }; // 상점 ID만 반환
   }
 
   // 상점 정보 수정

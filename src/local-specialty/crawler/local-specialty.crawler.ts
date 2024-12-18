@@ -1,4 +1,3 @@
-// src/local-specialty/crawler/local-specialty.crawler.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CrawlLocalSpecialty } from '../entities/local-specialty.crawler.entity';

@@ -24,20 +24,20 @@ export class User {
   @PrimaryGeneratedColumn({ type: 'int', unsigned: true })
   id: number;
 
-  @Column({ unique: true })
+  @Column()
   email: string;
 
   @Column({ select: false })
   password: string;
 
-  @Column({ unique: true })
+  @Column()
   nickname: string;
 
-  @Column({ nullable: true })
-  address?: string;
+  @Column()
+  address: string;
 
-  @Column({ nullable: true })
-  phone?: string;
+  @Column()
+  phone: string;
 
   @Column({ default: 0 })
   cash: number;
@@ -48,11 +48,11 @@ export class User {
   @CreateDateColumn()
   created_at: Date;
 
-  @UpdateDateColumn({ nullable: true })
-  updated_at?: Date;
+  @UpdateDateColumn()
+  updated_at: Date;
 
-  @DeleteDateColumn({ nullable: true })
-  deleted_at?: Date;
+  @DeleteDateColumn()
+  deleted_at: Date;
 
   @OneToOne(() => Store, (store) => store.user, { onDelete: 'CASCADE' })
   store: Store;

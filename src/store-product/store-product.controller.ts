@@ -14,11 +14,11 @@ import { StoreProductService } from './store-product.service';
 import { CreateStoreProductDto } from './dto/create-store-product.dto';
 import { UpdateStoreProductDto } from './dto/update-store-product.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User, UserRole } from 'src/user/entities/user.entity';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User, UserRole } from '../user/entities/user.entity';
+import { Roles } from '../common/decorators/roles.decorator';
+import { GetUser } from '../common/decorators/get-user.decorator';
 
 @ApiTags('StoreProduct')
 @ApiBearerAuth('access-token')
@@ -72,7 +72,7 @@ export class StoreProductController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.SELLER)
   @HttpCode(HttpStatus.OK)
-  async delete(
+  asyncdelete(
     @Param('product_id') product_id: number,
     @Param('store_id') store_id: number,
     @GetUser() user: User,

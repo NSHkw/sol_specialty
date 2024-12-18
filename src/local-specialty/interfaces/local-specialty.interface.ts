@@ -1,6 +1,6 @@
-import { SearchLocalSpecialtyDto } from '../local-specialty/dto/search-local-specialty.dto';
-import { LocalSpecialty } from '../local-specialty/entities/local-specialty.entity';
-import { Region } from '../local-specialty/types/region.type';
+import { SearchLocalSpecialtyDto } from '../dto/search-local-specialty.dto';
+import { LocalSpecialty } from '../entities/local-specialty.entity';
+import { Region } from '../types/region.type';
 
 export interface LocalSpecialtyServiceInterface {
   findAll(): Promise<LocalSpecialty[]>;

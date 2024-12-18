@@ -8,7 +8,7 @@ import { StoreProduct } from 'src/store-product/entities/store-product.entity';
 import { AuthUtils } from 'src/common/utils/auth.utils';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 import { CartItemResponse, DeleteOptions, DeleteResult } from './types/cart-item.service.type';
-import { CartItemServiceInterface } from '../interfaces/cart-item.interface';
+import { CartItemServiceInterface } from './interfaces/cart-item.interface';
 
 @Injectable()
 export class CartItemService implements CartItemServiceInterface {

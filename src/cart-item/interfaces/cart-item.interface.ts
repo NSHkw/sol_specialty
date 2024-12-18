@@ -1,8 +1,8 @@
-import { CartItem } from './../cart-item/entities/cart-item.entity';
-import { CreateCartItemDto } from './../cart-item/dto/create-cart-item.dto';
-import { User } from '../user/entities/user.entity';
-import { UpdateCartItemDto } from '../cart-item/dto/update-cart-item.dto';
-import { CartItemResponse } from '../cart-item/types/cart-item.service.type';
+import { CartItem } from '../entities/cart-item.entity';
+import { CreateCartItemDto } from '../dto/create-cart-item.dto';
+import { User } from '../../user/entities/user.entity';
+import { UpdateCartItemDto } from '../dto/update-cart-item.dto';
+import { CartItemResponse } from '../types/cart-item.service.type';
 
 export interface CartItemServiceInterface {
   create(user: User, store_id: number, createCartItemDto: CreateCartItemDto): Promise<CartItem>;
