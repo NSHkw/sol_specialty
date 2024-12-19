@@ -1,6 +1,5 @@
 // src/order/order.validator.ts
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { OrderRepository } from './order.repository';
 import { DirectOrderDto } from './dto/direct-order.dto';
 import { StoreProductRepository } from '../store-product/store-product.repository';
 import { CartOrderDto } from './dto/cart-order.dto';

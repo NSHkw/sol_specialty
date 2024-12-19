@@ -1,4 +1,4 @@
-import { LocalSpecialtyRepository } from 'src/local-specialty/local-specialty.repository';
+import { LocalSpecialtyRepository } from '../local-specialty/local-specialty.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Region } from './types/region.type';
 

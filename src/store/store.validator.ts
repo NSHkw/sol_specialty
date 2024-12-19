@@ -6,7 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { StoreRepository } from './store.repository';
-import { UserRepository } from 'src/user/user.repository';
+import { UserRepository } from '../user/user.repository';
 import { Store } from './entities/store.entity';
 
 @Injectable()

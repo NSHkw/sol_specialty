@@ -5,14 +5,12 @@ import { User } from '../../user/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  Index,
 } from 'typeorm';
 
 @Entity('store')

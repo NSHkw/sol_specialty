@@ -11,7 +11,6 @@ import { AuthModule } from '../auth/auth.module';
 import { StoreProductValidator } from './store-product.validator';
 import { StoreProductRepository } from './store-product.repository';
 import { LocalSpecialtyModule } from '../local-specialty/local-specialty.module';
-import { StoreValidator } from '../store/store.validator';
 
 @Module({
   imports: [

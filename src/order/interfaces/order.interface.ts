@@ -1,5 +1,5 @@
 // src/order/interfaces/order.interface.ts
-import { User } from 'src/user/entities/user.entity';
+import { User } from '../../user/entities/user.entity';
 import { DirectOrderDto } from '../dto/direct-order.dto';
 import { Order } from '../entities/order.entity';
 import { CartOrderDto } from '../dto/cart-order.dto';

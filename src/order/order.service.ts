@@ -15,7 +15,7 @@ import { UserRepository } from '../user/user.repository';
 import { OrderResponse } from './types/order.type';
 import { OrderValidator } from './order.validator';
 import { EntityManager, In } from 'typeorm';
-import { CartItem } from 'src/cart-item/entities/cart-item.entity';
+import { CartItem } from '../cart-item/entities/cart-item.entity';
 
 @Injectable()
 export class OrderService implements OrderInterface {
