@@ -30,6 +30,6 @@ import { StoreValidator } from '../store/store.validator';
       useClass: StoreProductRepository,
     },
   ],
-  exports: [StoreProductService, StoreProductRepository, TypeOrmModule],
+  exports: [StoreProductService, StoreProductRepository],
 })
 export class StoreProductModule {}

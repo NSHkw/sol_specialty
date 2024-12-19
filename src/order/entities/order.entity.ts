@@ -1,3 +1,4 @@
+// src/order/entities/order.entity.ts
 import { OrderItem } from '../../order/entities/order-item.entity';
 import { User } from '../../user/entities/user.entity';
 import {

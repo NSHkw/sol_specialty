@@ -3,7 +3,7 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { CartItemRepository } from './cart-item.repository';
 import { StoreProductRepository } from '../store-product/store-product.repository';
 import { CartItem } from './entities/cart-item.entity';
-import { StoreProduct } from 'src/store-product/entities/store-product.entity';
+import { StoreProduct } from '../store-product/entities/store-product.entity';
 import { DeleteOptions, DeleteResult } from './types/cart-item.type';
 
 @Injectable()
@@ -28,7 +28,10 @@ export class CartItemValidator {
     store_id: number,
     quantity: number,
   ): Promise<StoreProduct> {
-    const storeProduct = await this.storeProductRepository.findOne(store_product_id, store_id);
+    const storeProduct = await this.storeProductRepository.findOne({
+      id: store_product_id,
+      store_id,
+    });
 
     if (!storeProduct) {
       throw new NotFoundException('해당 상점 상품 찾을 수 없음');

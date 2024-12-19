@@ -96,16 +96,6 @@ export class LocalSpecialtyService implements LocalSpecialtyInterface {
     return specialty[0];
   }
 
-  // 필요한 경우 storeProducts 포함하여 조회하는 메서드 추가
-  // async findAllWithStoreProducts(): Promise<LocalSpecialty[]> {
-  //   return this.localSpecialtyRepository.find({
-  //     where: {
-  //       deleted_at: IsNull(),
-  //     },
-  //     relations: ['storeProducts'],
-  //   });
-  // }
-
   /**
    * 특산품 검색
    * @param searchDto 검색 조건
@@ -121,7 +111,7 @@ export class LocalSpecialtyService implements LocalSpecialtyInterface {
     const conditions: SearchConditions = {};
 
     if (searchDto.keyword) {
-      conditions.name = Like(`%${searchDto.keyword}%`);
+      conditions.keyword = searchDto.keyword;
     }
 
     if (searchDto.region) {
