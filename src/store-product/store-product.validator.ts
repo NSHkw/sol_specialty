@@ -1,7 +1,6 @@
 // src/store-product/store-product.validator.ts
 import { StoreValidator } from './../store/store.validator';
 import { LocalSpecialtyRepository } from 'src/local-specialty/local-specialty.repository';
-import { StoreProductRepository } from './store-product.repository';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { LocalSpecialty } from 'src/local-specialty/entities/local-specialty.entity';
 import { Store } from 'src/store/entities/store.entity';
@@ -9,7 +8,6 @@ import { Store } from 'src/store/entities/store.entity';
 @Injectable()
 export class StoreProductValidator {
   constructor(
-    private readonly storeProductRepository: StoreProductRepository,
     private readonly localSpecialtyRepository: LocalSpecialtyRepository,
     private readonly storeValidator: StoreValidator,
   ) {}

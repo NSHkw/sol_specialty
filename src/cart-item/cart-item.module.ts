@@ -7,6 +7,8 @@ import { UserModule } from '../user/user.module';
 import { StoreProductModule } from '../store-product/store-product.module';
 import { AuthModule } from '../auth/auth.module';
 import { StoreProduct } from '../store-product/entities/store-product.entity';
+import { CartItemValidator } from './cart-item.validator';
+import { CartItemRepository } from './cart-item.repository';
 
 @Module({
   imports: [
@@ -16,7 +18,11 @@ import { StoreProduct } from '../store-product/entities/store-product.entity';
     forwardRef(() => StoreProductModule),
   ],
   controllers: [CartItemController],
-  providers: [CartItemService],
-  exports: [CartItemService],
+  providers: [
+    CartItemService,
+    CartItemValidator,
+    { provide: CartItemRepository, useClass: CartItemRepository },
+  ],
+  exports: [CartItemService, TypeOrmModule, CartItemValidator, CartItemRepository],
 })
 export class CartItemModule {}

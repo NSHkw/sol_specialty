@@ -1,3 +1,4 @@
+// src/cart-item/interfaces/cart-item.interface.ts
 import { CartItem } from '../entities/cart-item.entity';
 import { CreateCartItemDto } from '../dto/create-cart-item.dto';
 import { User } from '../../user/entities/user.entity';

@@ -1,3 +1,4 @@
+// src/cart-item/types/cart-item.type.ts
 import { CartItem } from '../entities/cart-item.entity';
 
 export type CartItemResponse = {

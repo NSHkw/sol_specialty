@@ -139,6 +139,13 @@ export class StoreRepository {
     });
   }
 
+  async updateReviewStats(store_id: number, rating: number, reviewCount: number): Promise<void> {
+    await this.storeRepository.update(store_id, {
+      rating,
+      review_count: reviewCount,
+    });
+  }
+
   mapToStoreInfoList(stores: Store[]): StoreBaseInfo[] {
     return stores.map((store) => ({
       id: store.id,

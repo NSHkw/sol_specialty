@@ -1,3 +1,4 @@
+// src/order/order.controller.ts
 import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
 import { OrderService } from './order.service';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -39,14 +40,14 @@ export class OrderController {
   @Get()
   @UseGuards(JwtAuthGuard)
   async findAll(@GetUser() user: User) {
-    return this.orderService.findAll(user);
+    return this.orderService.findAllOrder(user);
   }
 
   // 주문 하나 조회하기
   @Get(':id')
   @UseGuards(JwtAuthGuard)
   async findOne(@GetUser() user: User, @Param('id') id: number) {
-    return this.orderService.findOne(user, id);
+    return this.orderService.findOneDetailOrder(user, id);
   }
 
   // 주문의 배송 상태 확인하기
@@ -60,6 +61,6 @@ export class OrderController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   async cancel(@GetUser() user: User, @Param('id') id: number) {
-    return this.orderService.cancel(user, id);
+    return this.orderService.cancelOrder(user, id);
   }
 }

@@ -63,7 +63,10 @@ export class StoreProductService implements StoreProductInterface {
    * @returns
    */
   async findOneProductInStore(product_id: number, store_id: number): Promise<StoreProduct> {
-    const product = await this.storeProductRepository.findOne(product_id, store_id);
+    const product = await this.storeProductRepository.findOne({
+      id: product_id,
+      store_id: store_id,
+    });
 
     if (!product) {
       throw new NotFoundException('상점 내 상품 존재 X');
