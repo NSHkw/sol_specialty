@@ -124,7 +124,7 @@ export class LocalSpecialtyCrawler {
               },
             );
             this.logger.log(
-              `Updated specialty: ${specialty.name} from ${regionFullName} ${cityName}`,
+              `특산물 업데이트: ${specialty.name} from ${regionFullName} ${cityName}`,
             );
           } else {
             const newSpecialty = this.localSpecialty.create({
@@ -137,9 +137,7 @@ export class LocalSpecialtyCrawler {
             });
 
             await this.localSpecialty.save(newSpecialty);
-            this.logger.log(
-              `Saved specialty: ${specialty.name} from ${regionFullName} ${cityName}`,
-            );
+            this.logger.log(`특산물 저장: ${specialty.name} from ${regionFullName} ${cityName}`);
           }
         }),
       );
