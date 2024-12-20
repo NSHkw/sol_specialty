@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>마이페이지 리뷰</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 75px);
+            background: white;
+        }
+
+        .Mypagebar {
+            width: 285px;
+            height: 100%;
+            background: white;
+            border: 1px black solid;
+        }
+
+        .menu-text {
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 32px;
+            font-weight: 600;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .menu-text.gray {
+            color: #E0DCDC;
+            font-size: 15px;
+        }
+
+        .info-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .info-box {
+            width: 100%;
+            max-width: 400px;
+            height: 30px;
+            background: #D9D9D9;
+            margin: 10px 0;
+            text-align: center;
+            line-height: 30px;
+        }
+
+        .label {
+            text-align: center;
+            color: black;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+
+        .update-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #51FF00;
+            border: none;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .reviews-container {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .review {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="homepage.loginafter.html">Home</a>
+        <a href="storemain.loginafter.html">상점</a>
+        <a href="local.loginafter.html">특산물</a>
+        <a href="goods.list.loginafter.html">상품 관리</a>
+        <a href="mypage.html">마이페이지</a>
+        <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
+    </div>
+
+    <div class="container">
+        <div class="Mypagebar">
+            <div class="menu-text">
+                <a class="menu-text" href="mypage.html">내 정보</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="mypage.orderlist.html">주문 목록</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="mypage.review.html">리뷰</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="cash.html">캐쉬 충전</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="rolechange.html">직업 변경</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text gray" href="accountdelete.html">회원 탈퇴</a>
+            </div>
+        </div>
+
+        <div class="info-container">
+            <div class="label">상점 ID 입력</div>
+            <input type="number" id="storeIdInput" class="info-box" placeholder="상점 ID를 입력하세요" required>
+            <button id="fetchReviewsButton" class="update-button">리뷰 조회</button>
+            <div id="reviews" class="reviews-container"></div> <!-- 리뷰 표시 공간 -->
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('token'); // 토큰 삭제
+            localStorage.removeItem('userId'); // 사용자 ID 삭제
+            window.location.href = 'homepage.loginbefore.html'; // 로그인 페이지로 리다이렉트
+        }
+
+        // 로그아웃 버튼 클릭 시 logout 함수 호출
+        document.getElementById('logoutButton').addEventListener('click', function (event) {
+            event.preventDefault(); // 기본 링크 클릭 동작 방지
+            logout(); // logout 함수 호출
+        });
+
+        document.getElementById('fetchReviewsButton').addEventListener('click', async () => {
+            const storeId = document.getElementById('storeIdInput').value; // 스토어 ID 입력 필드에서 값 가져오기
+            if (!storeId) {
+                alert('상점 ID를 입력하세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/review/${storeId}`);
+                if (!response.ok) {
+                    throw new Error('리뷰를 가져오는 중 오류가 발생했습니다.');
+                }
+                const data = await response.json();
+                displayReviews(data);
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+            }
+        });
+
+        function displayReviews(data) {
+            const reviewsContainer = document.getElementById('reviews');
+            reviewsContainer.innerHTML = ''; // 기존 리뷰 삭제
+
+            const storeName = document.createElement('h3');
+            storeName.textContent = data.상점_이름;
+            reviewsContainer.appendChild(storeName);
+
+            const reviewCount = document.createElement('p');
+            reviewCount.textContent = `총 리뷰 개수: ${data.총_리뷰_개수}`;
+            reviewsContainer.appendChild(reviewCount);
+
+            const averageRating = document.createElement('p');
+            averageRating.textContent = `평균 리뷰 점수: ${data.평균_리뷰_점수}`;
+            reviewsContainer.appendChild(averageRating);
+
+            if (data.reviews.length > 0) {
+                data.reviews.forEach(review => {
+                    const reviewDiv = document.createElement('div');
+                    reviewDiv.className = 'review';
+                    reviewDiv.innerHTML = `
+                <strong>${review.user.nickname}:</strong> ${review.rating}점 - ${review.content}
+                <button class="edit-review-button" data-review-id="${review.id}" data-store-id="${review.store_id}">수정</button>
+                <button class="delete-review-button" data-review-id="${review.id}" data-store-id="${review.store_id}">삭제</button>
+                <div class="edit-review-form" style="display:none;">
+                    <input type="number" min="1" max="5" class="edit-review-rating" placeholder="새 평점 (1-5)">
+                    <textarea class="edit-review-content" placeholder="새 리뷰 내용을 입력하세요"></textarea>
+                    <input type="number" class="edit-store-id" placeholder="상점 ID를 입력하세요" value="${review.store_id}">
+                    <button class="submit-edit-review-button">수정 완료</button>
+                </div>
+                <div class="delete-review-form" style="display:none;">
+                    <input type="number" class="delete-store-id" placeholder="상점 ID를 입력하세요">
+                    <button class="confirm-delete-button">삭제 확인</button>
+                </div>
+            `;
+                    reviewsContainer.appendChild(reviewDiv);
+                });
+            } else {
+                reviewsContainer.innerHTML += '<p>리뷰가 없습니다.</p>';
+            }
+
+            // 수정 버튼 클릭 이벤트 핸들링
+            document.querySelectorAll('.edit-review-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const reviewDiv = event.target.closest('.review');
+                    const editForm = reviewDiv.querySelector('.edit-review-form');
+                    editForm.style.display = 'block'; // 수정 폼을 보이도록 설정
+                });
+            });
+
+            // 삭제 버튼 클릭 이벤트 핸들링
+            document.querySelectorAll('.delete-review-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const reviewDiv = event.target.closest('.review');
+                    const deleteForm = reviewDiv.querySelector('.delete-review-form');
+                    deleteForm.style.display = 'block'; // 상점 ID 입력 폼을 보이도록 설정
+                });
+            });
+
+            // 삭제 확인 버튼 클릭 이벤트 핸들링
+            document.querySelectorAll('.confirm-delete-button').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const reviewDiv = event.target.closest('.review');
+                    const storeId = reviewDiv.querySelector('.delete-store-id').value; // 상점 ID 가져오기
+                    const reviewId = reviewDiv.querySelector('.delete-review-button').dataset.reviewId;
+
+                    // 입력값 검증
+                    if (!storeId) {
+                        alert('상점 ID를 입력하세요.');
+                        return;
+                    }
+
+                    const confirmDelete = confirm('정말로 이 리뷰를 삭제하시겠습니까?');
+                    if (confirmDelete) {
+                        try {
+                            const response = await fetch(`/review/${storeId}`, {
+                                method: 'DELETE',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                            });
+
+                            if (!response.ok) {
+                                throw new Error('리뷰 삭제 중 오류가 발생했습니다.');
+                            }
+
+                            const result = await response.json();
+                            alert(result.message);
+                            // 리뷰를 다시 불러와서 갱신
+                            document.getElementById('fetchReviewsButton').click();
+                        } catch (error) {
+                            console.error(error);
+                            alert(error.message);
+                        }
+                    }
+                });
+            });
+
+            // 수정 완료 버튼 클릭 이벤트 핸들링
+            document.querySelectorAll('.submit-edit-review-button').forEach(button => {
+                button.addEventListener('click', async (event) => {
+                    const reviewDiv = event.target.closest('.review');
+                    const reviewId = reviewDiv.querySelector('.edit-review-button').dataset.reviewId;
+                    const newRating = reviewDiv.querySelector('.edit-review-rating').value;
+                    const newContent = reviewDiv.querySelector('.edit-review-content').value;
+                    const storeId = reviewDiv.querySelector('.edit-store-id').value; // 상점 ID 가져오기
+
+                    // 입력값 검증
+                    if (!newRating || !newContent || !storeId) {
+                        alert('평점, 내용, 상점 ID를 입력하세요.');
+                        return;
+                    }
+
+                    const parsedRating = parseInt(newRating);
+
+                    // 평점이 유효한지 확인
+                    if (isNaN(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+                        alert('평점은 1과 5 사이의 숫자여야 합니다.');
+                        return;
+                    }
+
+                    const requestData = {
+                        rating: parsedRating,
+                        content: newContent
+                    };
+
+                    try {
+                        const response = await fetch(`/review/${storeId}`, {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                            },
+                            body: JSON.stringify(requestData)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error('리뷰 수정 중 오류가 발생했습니다.');
+                        }
+
+                        const result = await response.json();
+                        alert(result.message);
+                        // 리뷰를 다시 불러와서 갱신
+                        document.getElementById('fetchReviewsButton').click();
+                    } catch (error) {
+                        console.error(error);
+                        alert(error.message);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

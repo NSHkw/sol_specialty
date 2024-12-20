@@ -109,14 +109,14 @@
         <a href="homepage.loginbefore.html">Home</a>
         <a href="storemain.loginbefore.html">상점</a>
         <a href="local.loginbefore.html">특산물</a>
-        <a href="#orders">주문</a>
         <a href="goods.list.loginbefore.html">상품 관리</a>
         <a href="login.html" id="logoutButton">로그인</a>
     </div>
+
     <div class="container">
         <div class="Mypagebar">
             <div class="menu-text">
-                <a class="menu-text" href="goods.list.loginbefore.html">상품 목록</a>
+                <a class="menu-text" href="goods.list.loginafter.html">상품 목록</a>
             </div>
         </div>
         <div>
@@ -143,8 +143,9 @@
                 }
 
                 const data = await response.json();
-                const container = document.getElementById('container');
+                console.log(data); // 데이터 로그 출력으로 확인
 
+                const container = document.getElementById('container');
                 container.innerHTML = ''; // 기존 내용 삭제
 
                 if (data.length > 0) {
@@ -152,12 +153,26 @@
                         const group = document.createElement('div');
                         group.className = 'Group1';
 
+                        // 필요한 속성에 안전하게 접근
+                        const productName = item.product_name || '이름 없음';
+                        const productDescription = item.description || '설명 없음'; // description 사용
+                        const productPrice = item.price !== undefined ? item.price : '가격 없음';
+                        const productStock = item.stock !== undefined ? item.stock : '재고 정보 없음'; // stock 사용
+
                         group.innerHTML = `
-                            <div class="title title-product_name">${item.product_name}</div>
-                            <div class="description title-description">${item.description}</div>
-                            <div class="title title-price">가격: ${item.price} 원</div>
-                            <div class="title title-stock">재고: ${item.stock}</div>
-                        `;
+                    <div class="title title-product_name">${productName}</div>
+                    <div class="description title-description">${productDescription}</div>
+                    <div class="title title-price">가격: ${productPrice} 원</div>
+                    <div class="title title-stock">재고: ${productStock}</div>
+                    <button class="order-button" data-product-id="${item.id}">주문하기</button>
+                    <button class="review-button" data-product-id="${item.id}">리뷰 달기</button>
+                    <div class="review-form" style="display:none;">
+                        <input type="number" placeholder="상점 ID" class="review-store-id" required>
+                        <textarea placeholder="리뷰 내용을 입력하세요" class="review-content" required></textarea>
+                        <input type="number" min="1" max="5" placeholder="평점 (1-5)" class="review-rating" required>
+                        <button class="submit-review" data-product-id="${item.id}">리뷰 제출</button>
+                    </div>
+                `;
 
                         container.appendChild(group);
                     });
@@ -176,6 +191,59 @@
                     fetchLocalSpecialties(storeId); // 입력한 상점 ID로 상품 목록 조회
                 } else {
                     alert('상점 ID를 입력하세요.');
+                }
+            });
+
+            document.getElementById('container').addEventListener('click', async (event) => {
+                if (event.target.classList.contains('order-button')) {
+                    const productId = event.target.getAttribute('data-product-id');
+                    const quantity = prompt("주문할 수량을 입력하세요:");
+
+                    // 주소 입력
+                    const orderAddress = prompt("주문할 주소를 입력하세요:");
+                    if (!orderAddress) {
+                        alert('주소를 입력해야 합니다.');
+                        return;
+                    }
+
+                    // 주문 방법 선택
+                    const validOrderMethods = ['일반 택배', '직접 수령', '우체국 택배'];
+                    const orderMethod = prompt(`주문 방법을 입력하세요 (${validOrderMethods.join(', ')}):`);
+                    if (!validOrderMethods.includes(orderMethod)) {
+                        alert(`유효한 주문 방법을 입력하세요: ${validOrderMethods.join(', ')}`);
+                        return;
+                    }
+
+                    // 수량 및 상품 ID 유효성 검사
+                    if (quantity && !isNaN(quantity) && quantity > 0 && !isNaN(productId)) {
+                        try {
+                            const response = await fetch('/order/direct', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                                },
+                                body: JSON.stringify({
+                                    store_product_id: parseInt(productId, 10), // 숫자로 변환
+                                    quantity: parseInt(quantity, 10),
+                                    order_address: orderAddress,
+                                    order_method: orderMethod
+                                })
+                            });
+
+                            if (!response.ok) {
+                                const errorResponse = await response.json();
+                                throw new Error(errorResponse.message || '주문 처리 중 오류가 발생했습니다.');
+                            }
+
+                            alert('주문이 성공적으로 완료되었습니다.');
+                        } catch (error) {
+                            console.error('주문 처리 오류:', error);
+                            alert(`주문 처리 오류: ${error.message}`);
+                        }
+                    } else {
+                        alert('유효한 수량을 입력하세요.');
+                    }
                 }
             });
 

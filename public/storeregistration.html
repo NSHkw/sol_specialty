@@ -62,7 +62,12 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: calc(100vh - 75px); /* 헤더 높이 제외 */
+            height: 100%;
+            /* Mypagebar와 같은 높이로 조정 */
+            padding: 700px;
+            /* 적당한 패딩 추가 */
+            padding-bottom: 0px;
+            padding-top: 0px;
         }
 
         form {
@@ -90,7 +95,6 @@
         <a href="homepage.loginafter.html">Home</a>
         <a href="storemain.loginafter.html">상점</a>
         <a href="local.loginafter.html">특산물</a>
-        <a href="#orders">주문</a>
         <a href="goods.list.loginafter.html">상품 관리</a>
         <a href="mypage.html">마이페이지</a>
         <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
@@ -99,13 +103,16 @@
     <div class="container">
         <div class="Mypagebar">
             <div class="menu-text">
-                <a class="menu-text" href="storemain.loginafter.html">상점 조회</a>
+                <a class="menu-text" href="storemain.loginafter.html" id="storeView">상점 조회</a>
             </div>
             <div class="menu-text">
                 <a class="menu-text" href="storeregistration.html">상점 등록</a>
             </div>
             <div class="menu-text">
                 <a class="menu-text" href="storecheck.html">상점 확인</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="store.review.html">상점 리뷰 확인</a>
             </div>
             <div class="menu-text">
                 <a class="menu-text" href="storedelete.html">상점 삭제</a>

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상점 확인</title>
+    <title>상점 리뷰</title>
     <style>
         body {
             margin: 0;
@@ -74,6 +74,39 @@
             text-align: center;
             line-height: 30px;
         }
+
+        .label {
+            text-align: center;
+            color: black;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+
+        .update-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #51FF00;
+            border: none;
+            color: black;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .reviews-container {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 600px;
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .review {
+            border-bottom: 1px solid #ccc;
+            padding: 10px 0;
+        }
     </style>
 </head>
 
@@ -86,6 +119,7 @@
         <a href="mypage.html">마이페이지</a>
         <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
     </div>
+
     <div class="container">
         <div class="Mypagebar">
             <div class="menu-text">
@@ -106,15 +140,10 @@
         </div>
 
         <div class="info-container">
-            <div class="label">상점 이름</div>
-            <div class="info-box" id="storeName"></div>
-            <div class="label">설명</div>
-            <div class="info-box" id="storeDescription"></div>
-            <div class="label">주소</div>
-            <div class="info-box" id="storeAddress"></div>
-            <div class="correction">
-                <a href="storecheck.correction.html">수정</a>
-            </div>
+            <div class="label">상점 ID 입력</div>
+            <input type="number" id="storeIdInput" class="info-box" placeholder="상점 ID를 입력하세요" required>
+            <button id="fetchReviewsButton" class="update-button">리뷰 조회</button>
+            <div id="reviews" class="reviews-container"></div> <!-- 리뷰 표시 공간 -->
         </div>
     </div>
 
@@ -125,73 +154,59 @@
             window.location.href = 'homepage.loginbefore.html'; // 로그인 페이지로 리다이렉트
         }
 
+        // 로그아웃 버튼 클릭 시 logout 함수 호출
         document.getElementById('logoutButton').addEventListener('click', function (event) {
             event.preventDefault(); // 기본 링크 클릭 동작 방지
             logout(); // logout 함수 호출
         });
 
-        async function fetchStoreDetails(storeId) {
-            try {
-                const response = await fetch(`/store/${storeId}`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error('상점 정보를 가져오는 데 실패했습니다.');
-                }
-
-                const storeData = await response.json();
-
-                // storeData가 객체인 경우
-                if (storeData) {
-                    // HTML 요소에 데이터 출력
-                    document.getElementById('storeName').textContent = storeData.name || 'N/A';
-                    document.getElementById('storeDescription').textContent = storeData.description || 'N/A';
-                    document.getElementById('storeAddress').textContent = storeData.address || 'N/A';
-                } else {
-                    // 데이터가 없을 경우 처리
-                    document.getElementById('storeName').textContent = '상점 정보가 없습니다.';
-                    document.getElementById('storeDescription').textContent = '상점 정보가 없습니다.';
-                    document.getElementById('storeAddress').textContent = '상점 정보가 없습니다.';
-                }
-            } catch (error) {
-                console.error('Error fetching store details:', error);
-            }
-        }
-
-        // 페이지가 로드될 때 사용자 ID로 상점 ID 가져오기
-        async function fetchStoreId() {
-            const userId = localStorage.getItem('userId'); // 로컬 스토리지에서 사용자 ID 가져오기
-
-            if (!userId) {
-                console.error('사용자 ID가 로컬 스토리지에 없습니다.');
+        document.getElementById('fetchReviewsButton').addEventListener('click', async () => {
+            const storeId = document.getElementById('storeIdInput').value;
+            if (!storeId) {
+                alert('상점 ID를 입력하세요.');
                 return;
             }
 
             try {
-                const response = await fetch(`/store/${userId}/storeid`, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
-                    },
-                });
-
+                const response = await fetch(`/review/${storeId}`);
                 if (!response.ok) {
-                    throw new Error('상점 ID를 가져오는 데 실패했습니다.');
+                    throw new Error('리뷰를 가져오는 중 오류가 발생했습니다.');
                 }
-
-                const { storeId } = await response.json(); // 상점 ID 가져오기
-                fetchStoreDetails(storeId); // 상점 ID로 상세 정보 조회
+                const data = await response.json();
+                displayReviews(data);
             } catch (error) {
-                console.error('Error fetching store ID:', error);
+                console.error(error);
+                alert(error.message);
+            }
+        });
+
+        function displayReviews(data) {
+            const reviewsContainer = document.getElementById('reviews');
+            reviewsContainer.innerHTML = ''; // 기존 리뷰 삭제
+
+            const storeName = document.createElement('h3');
+            storeName.textContent = data.상점_이름;
+            reviewsContainer.appendChild(storeName);
+
+            const reviewCount = document.createElement('p');
+            reviewCount.textContent = `총 리뷰 개수: ${data.총_리뷰_개수}`;
+            reviewsContainer.appendChild(reviewCount);
+
+            const averageRating = document.createElement('p');
+            averageRating.textContent = `평균 리뷰 점수: ${data.평균_리뷰_점수}`;
+            reviewsContainer.appendChild(averageRating);
+
+            if (data.reviews.length > 0) {
+                data.reviews.forEach(review => {
+                    const reviewDiv = document.createElement('div');
+                    reviewDiv.className = 'review';
+                    reviewDiv.innerHTML = `<strong>${review.user.nickname}:</strong> ${review.rating}점 - ${review.content}`;
+                    reviewsContainer.appendChild(reviewDiv);
+                });
+            } else {
+                reviewsContainer.innerHTML += '<p>리뷰가 없습니다.</p>';
             }
         }
-
-        // 페이지가 로드될 때 사용자 ID로 상점 ID 가져오기
-        window.onload = fetchStoreId;
     </script>
 </body>
 

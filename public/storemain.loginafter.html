@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상점 조회</title>
+    <title>상점 검색</title>
     <style>
         body {
             margin: 0;
@@ -109,22 +109,24 @@
         <a href="homepage.loginafter.html">Home</a>
         <a href="storemain.loginafter.html">상점</a>
         <a href="local.loginafter.html">특산물</a>
-        <a href="#orders">주문</a>
         <a href="goods.list.loginafter.html">상품 관리</a>
         <a href="mypage.html">마이페이지</a>
         <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
     </div>
-    
+
     <div class="container">
         <div class="Mypagebar">
             <div class="menu-text">
-                <a class="menu-text" href="storemain.loginafter.html">상점 조회</a>
+                <a class="menu-text" href="storemain.loginafter.html" id="storeView">상점 조회</a>
             </div>
             <div class="menu-text">
                 <a class="menu-text" href="storeregistration.html">상점 등록</a>
             </div>
             <div class="menu-text">
                 <a class="menu-text" href="storecheck.html">상점 확인</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="store.review.html">상점 리뷰 확인</a>
             </div>
             <div class="menu-text">
                 <a class="menu-text" href="storedelete.html">상점 삭제</a>
@@ -154,7 +156,7 @@
 
         async function fetchLocalSpecialties(keyword) {
             try {
-                const response = await fetch('http://localhost:3000/store/search', {
+                const response = await fetch('/store/search', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -167,8 +169,9 @@
                 }
 
                 const data = await response.json();
-                const container = document.getElementById('container');
+                console.log(data); // API 응답 데이터 확인
 
+                const container = document.getElementById('container');
                 container.innerHTML = ''; // 기존 내용 삭제
 
                 if (data.stores.length > 0) {
@@ -176,11 +179,23 @@
                         const group = document.createElement('div');
                         group.className = 'Group1';
 
+                        // localSpecialties가 정의되어 있는지 확인
+                        const specialties = store.local_specialties || [];
+                        const specialtiesNames = specialties.length > 0
+                            ? specialties.map(specialty => specialty.name).join(', ')
+                            : '특산물이 없습니다.'; // 특산물이 없을 때의 메시지
+
+                        // 평균 평점과 총 리뷰 수
+                        const averageRating = store.review_stats && store.review_stats.average_rating !== undefined
+                            ? store.review_stats.average_rating
+                            : '정보 없음'; // 평균 평점이 없을 때의 메시지
+
                         group.innerHTML = `
-                            <div class="title title-name">${store.name}</div>
-                            <div class="description title-description">${store.localSpecialties.map(specialty => specialty.name).join(', ')}</div>
-                            <div class="title title-rating">평균 평점: ${store.reviewStats.averageRating}</div>
-                        `;
+                    <div class="title title-id">id ${store.id}</div>
+                    <div class="title title-name">${store.name}</div>
+                    <div class="description title-description">${specialtiesNames}</div>
+                    <div class="title title-rating">평균 평점: ${averageRating}</div>
+                `;
 
                         container.appendChild(group);
                     });
@@ -191,6 +206,8 @@
                 console.error('Error fetching data:', error);
             }
         }
+
+
 
         async function fetchAllLocalSpecialties() {
             // 전체 데이터 조회
