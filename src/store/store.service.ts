@@ -77,14 +77,13 @@ export class StoreService implements StoreInterface {
     return { message: `${store.name} 삭제` };
   }
 
-  async findStoreByUserId(user_id: number): Promise<Store> {
+  async findStoreByUserId(user_id: number): Promise<{ id: number }> {
     const store = await this.storeRepository.findByUserId(user_id);
 
     if (!store) {
       throw new NotFoundException('해당 사용자의 상점이 존재하지 않습니다.');
     }
-
-    return store;
+    return { id: store.id };
   }
 
   // 사이트에 존재하는 모든 상점 조회

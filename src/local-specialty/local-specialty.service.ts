@@ -111,7 +111,7 @@ export class LocalSpecialtyService implements LocalSpecialtyInterface {
     const conditions: SearchConditions = {};
 
     if (searchDto.keyword) {
-      conditions.keyword = searchDto.keyword;
+      conditions.name = Like(`%${searchDto.keyword}%`);
     }
 
     if (searchDto.region) {

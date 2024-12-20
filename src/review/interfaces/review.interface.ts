@@ -1,7 +1,7 @@
 // src/review/interfaces/review.interface.ts
 import { User } from '../../user/entities/user.entity';
 import { CreateReviewDto } from '../dto/create-review.dto';
-import { ReviewResponse } from '../types/review.type';
+import { ReviewDetailResponse, ReviewResponse } from '../types/review.type';
 import { Review } from '../entities/review.entity';
 import { UpdateReviewDto } from '../dto/update-review.dto';
 
@@ -13,7 +13,7 @@ export interface ReviewInterface {
 
   deleteReview(user: User, store_id: number): Promise<ReviewResponse>;
 
-  getAllReviewsOfStore(store_id: number): Promise<Review[]>;
+  getAllReviewsOfStore(store_id: number): Promise<ReviewDetailResponse>;
 
   updateReview(
     user: User,

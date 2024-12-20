@@ -5,7 +5,7 @@ import { User } from '../user/entities/user.entity';
 import { Review } from './entities/review.entity';
 import { AuthUtils } from '../common/utils/auth.utils';
 import { ReviewInterface } from './interfaces/review.interface';
-import { ReviewResponse } from './types/review.type';
+import { ReviewDetailResponse, ReviewResponse } from './types/review.type';
 import { ReviewRepository } from './review.repository';
 import { StoreRepository } from '../store/store.repository';
 import { ReviewValidator } from './review.validator';
@@ -60,12 +60,26 @@ export class ReviewService implements ReviewInterface {
     };
   }
 
-  async getAllReviewsOfStore(store_id: number): Promise<Review[]> {
+  async getAllReviewsOfStore(store_id: number): Promise<ReviewDetailResponse> {
     await this.reviewValidator.validateStore(store_id);
 
-    const reviews = await this.reviewRepository.findAllByStoreId(store_id);
+    const [reviews, stats] = await Promise.all([
+      this.reviewRepository.findAllByStoreId(store_id),
+      this.reviewRepository.getStoreReviewStats(store_id),
+    ]);
 
-    return reviews;
+    return {
+      store_name: reviews[0]?.store.name || '알 수 없는 상점',
+      review_count: stats.count,
+      avg_rating: stats.rating,
+      reviews: reviews.map((review) => ({
+        user: {
+          nickname: review.user.nickname,
+        },
+        rating: review.rating,
+        content: review.content,
+      })),
+    };
   }
 
   async updateReview(

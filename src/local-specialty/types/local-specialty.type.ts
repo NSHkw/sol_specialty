@@ -3,7 +3,7 @@ import { Region } from './region.type';
 import { LocalSpecialty } from '../entities/local-specialty.entity';
 
 export type SearchConditions = {
-  keyword?: string;
+  name?: any;
   region?: Region;
 };
 
