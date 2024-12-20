@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #fff;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+            margin: 0;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 75px); /* 헤더 높이 제외 */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        input {
+            height: 35px;
+            padding: 0 10px;
+            font-size: 0.9rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            height: 40px;
+            background-color: #51FF00;
+            border: none;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45e000;
+        }
+
+        .form-footer {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* 추가된 스타일 */
+        .container {
+            width: 100%; /* 전체 너비 */
+            height: 1024px;
+            position: relative;
+        }
+
+        .image {
+            width: 100%; /* 전체 너비 */
+            height: 556px;
+            position: absolute;
+            left: 0;
+            top: 234px;
+        }
+
+        .header {
+            width: 100%; /* 전체 너비 */
+            height: 75px;
+            position: absolute;
+            top: 0;
+            background: #51FF00;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .button {
+            height: 59px;
+            background: #51FF00;
+            color: black;
+            font-size: 32px;
+            font-family: Inter, sans-serif;
+            font-weight: 400;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex: 1; /* 버튼이 균등하게 배치되도록 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+            text-decoration: none; /* 링크 스타일 제거 */
+            display: flex; /* flexbox 사용 */
+            align-items: center; /* 수직 중앙 정렬 */
+            justify-content: center; /* 수평 중앙 정렬 */
+        }
+
+        .button:hover {
+            background: #4CAF50; /* 버튼 호버 색상 */
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a href="homepage.loginbefore.html">Home</a>
+        <a href="storemain.loginbefore.html">상점</a>
+        <a href="local.loginbefore.html">특산물</a>
+        <a href="goods.list.loginbefore.html">상품 관리</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <h1>회원가입</h1>
+        <form action="/user/sign-up" method="POST">
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
+
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+
+            <label for="nickname">닉네임</label>
+            <input type="text" id="nickname" name="nickname" placeholder="닉네임을 입력하세요" required>
+
+            <label for="address">주소</label>
+            <input type="text" id="address" name="address" placeholder="주소를 입력하세요" required>
+
+            <label for="phone">전화번호</label>
+            <input type="tel" id="phone" name="phone" placeholder="전화번호를 입력하세요" required>
+
+            <label for="admincode">코드</label>
+            <input type="text" id="admincode" name="admincode" placeholder="코드를 입력하세요">
+
+            <div class="form-footer">
+                <button type="submit">회원가입</button>
+                <a href="login.html">이미 회원이신가요? 로그인</a>
+            </div>
+        </form>
+    </main>
+</body>
+</html>

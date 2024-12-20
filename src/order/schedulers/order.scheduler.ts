@@ -1,3 +1,4 @@
+// src/order/schedulers/order.scheduler.ts
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,8 +12,7 @@ export class OrderScheduler {
     private readonly orderRepository: Repository<Order>,
   ) {}
 
-  // cron: 정해진 시간에 자동으로 작업 실행하게 해주는 스케줄러 데코레이터
-  @Cron(CronExpression.EVERY_MINUTE) // 매 1분마다 아래 함수를 실행하라는 데코레이터
+  @Cron(CronExpression.EVERY_MINUTE)
   async updateOrderStatus() {
     // 각 상태별 기준 시간 출력
     const orderCompletedTime = new Date(Date.now() - 1 * 60 * 1000);
@@ -51,15 +51,5 @@ export class OrderScheduler {
 
       await this.orderRepository.save(order);
     }
-    // 주문 상태 흐름
-    // ShipStatus.PAYMENT_WAITING   결제 대기
-    // ↓
-    // ShipStatus.ORDER_COMPLETED   결제 완료
-    // ↓
-    // ShipStatus.SHIP_WAITING     배송 대기
-    // ↓
-    // ShipStatus.SHIPPING         배송 중
-    // ↓
-    // ShipStatus.DELIVERY_COMPLETED  배송 완료
   }
 }

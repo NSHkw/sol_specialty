@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상점 확인</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 75px);
+            background: white;
+        }
+
+        .Mypagebar {
+            width: 285px;
+            height: 100%;
+            background: white;
+            border: 1px black solid;
+        }
+
+        .menu-text {
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 32px;
+            font-weight: 600;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .info-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .info-box {
+            width: 100%;
+            max-width: 400px;
+            height: 30px;
+            background: #D9D9D9;
+            margin: 10px 0;
+            text-align: center;
+            line-height: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="homepage.loginafter.html">Home</a>
+        <a href="storemain.loginafter.html">상점</a>
+        <a href="local.loginafter.html">특산물</a>
+        <a href="goods.list.loginafter.html">상품 관리</a>
+        <a href="mypage.html">마이페이지</a>
+        <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
+    </div>
+    <div class="container">
+        <div class="Mypagebar">
+            <div class="menu-text">
+                <a class="menu-text" href="storemain.loginafter.html" id="storeView">상점 조회</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="storeregistration.html">상점 등록</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="storecheck.html">상점 확인</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="store.review.html">상점 리뷰 확인</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="storedelete.html">상점 삭제</a>
+            </div>
+        </div>
+
+        <div class="info-container">
+            <div class="label">상점 이름</div>
+            <div class="info-box" id="storeName"></div>
+            <div class="label">설명</div>
+            <div class="info-box" id="storeDescription"></div>
+            <div class="label">주소</div>
+            <div class="info-box" id="storeAddress"></div>
+            <div class="correction">
+                <a href="storecheck.correction.html">수정</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('token'); // 토큰 삭제
+            localStorage.removeItem('userId'); // 사용자 ID 삭제
+            window.location.href = 'homepage.loginbefore.html'; // 로그인 페이지로 리다이렉트
+        }
+
+        document.getElementById('logoutButton').addEventListener('click', function (event) {
+            event.preventDefault(); // 기본 링크 클릭 동작 방지
+            logout(); // logout 함수 호출
+        });
+
+        async function fetchStoreDetails(storeId) {
+            try {
+                const response = await fetch(`/store/${storeId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('상점 정보를 가져오는 데 실패했습니다.');
+                }
+
+                const storeData = await response.json();
+
+                // storeData가 객체인 경우
+                if (storeData) {
+                    // HTML 요소에 데이터 출력
+                    document.getElementById('storeName').textContent = storeData.name || 'N/A';
+                    document.getElementById('storeDescription').textContent = storeData.description || 'N/A';
+                    document.getElementById('storeAddress').textContent = storeData.address || 'N/A';
+                } else {
+                    // 데이터가 없을 경우 처리
+                    document.getElementById('storeName').textContent = '상점 정보가 없습니다.';
+                    document.getElementById('storeDescription').textContent = '상점 정보가 없습니다.';
+                    document.getElementById('storeAddress').textContent = '상점 정보가 없습니다.';
+                }
+            } catch (error) {
+                console.error('Error fetching store details:', error);
+            }
+        }
+
+        // 페이지가 로드될 때 사용자 ID로 상점 ID 가져오기
+        async function fetchStoreId() {
+            const userId = localStorage.getItem('userId'); // 로컬 스토리지에서 사용자 ID 가져오기
+
+            if (!userId) {
+                console.error('사용자 ID가 로컬 스토리지에 없습니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/store/${userId}/storeid`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('상점 ID를 가져오는 데 실패했습니다.');
+                }
+
+                const { storeId } = await response.json(); // 상점 ID 가져오기
+                fetchStoreDetails(storeId); // 상점 ID로 상세 정보 조회
+            } catch (error) {
+                console.error('Error fetching store ID:', error);
+            }
+        }
+
+        // 페이지가 로드될 때 사용자 ID로 상점 ID 가져오기
+        window.onload = fetchStoreId;
+    </script>
+</body>
+
+</html>

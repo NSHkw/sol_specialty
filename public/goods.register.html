@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품 등록</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 75px);
+            background: white;
+        }
+
+        .Mypagebar {
+            width: 285px;
+            height: 100%;
+            background: white;
+            border: 1px black solid;
+        }
+
+        .menu-text {
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 32px;
+            font-weight: 600;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .form-container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            background-color: #51FF00;
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="homepage.loginafter.html">Home</a>
+        <a href="storemain.loginafter.html">상점</a>
+        <a href="local.loginafter.html">특산물</a>
+        <a href="goods.list.loginafter.html">상품 관리</a>
+        <a href="mypage.html">마이페이지</a>
+        <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
+    </div>
+
+    <div class="container">
+        <div class="Mypagebar">
+            <div class="menu-text">
+                <a class="menu-text" href="goods.list.loginafter.html">상품 목록</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="goods.register.html">상품 등록</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="goods.correction.html">상품 수정</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="goods.delete.html">상품 삭제</a>
+            </div>
+        </div>
+
+        <div class="form-container">
+            <h2>상품 등록</h2>
+            <input type="number" id="storeId" placeholder="상점 ID를 입력하세요" required>
+            <input type="number" id="localSpecialtyId" placeholder="지역 특산품 ID를 입력하세요" required>
+            <input type="text" id="productName" placeholder="상품 이름을 입력하세요" required>
+            <input type="text" id="description" placeholder="상품 설명을 입력하세요" required>
+            <input type="number" id="price" placeholder="가격을 입력하세요" required>
+            <input type="number" id="stock" placeholder="재고를 입력하세요" required>
+            <button id="registerButton">상품 등록</button>
+        </div>
+    </div>
+
+    <script>
+        function logout() {
+            localStorage.removeItem('token'); // 토큰 삭제
+            localStorage.removeItem('userId'); // 사용자 ID 삭제
+            window.location.href = 'homepage.loginbefore.html'; // 로그인 페이지로 리다이렉트
+        }
+
+        // 로그아웃 버튼 클릭 시 logout 함수 호출
+        document.getElementById('logoutButton').addEventListener('click', function (event) {
+            event.preventDefault(); // 기본 링크 클릭 동작 방지
+            logout(); // logout 함수 호출
+        });
+
+        async function fetchStoreId() {
+            const userId = localStorage.getItem('userId');
+
+            if (!userId) {
+                console.error('사용자 ID가 로컬 스토리지에 없습니다.');
+                alert('사용자 ID가 필요합니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/store/${userId}/storeid`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('상점 ID를 가져오는 데 실패했습니다.');
+                }
+
+                const result = await response.json(); // 상점 ID 가져오기
+                storeId = result.storeId; // 전역 변수에 storeId 저장
+            } catch (error) {
+                console.error('Error fetching store ID:', error);
+                alert('상점 ID를 가져오는 데 오류가 발생했습니다.');
+            }
+        }
+
+        async function registerProduct() {
+            const storeId = document.getElementById('storeId').value;
+            const localSpecialtyId = document.getElementById('localSpecialtyId').value;
+            const productName = document.getElementById('productName').value;
+            const description = document.getElementById('description').value;
+            const price = document.getElementById('price').value;
+            const stock = document.getElementById('stock').value;
+
+            // 입력값 검증
+            if (!storeId || !localSpecialtyId || !productName || !description || !price || !stock) {
+                alert('모든 필드를 입력해야 합니다.');
+                return;
+            }
+
+            const createStoreProductDto = {
+                local_specialty_id: Number(localSpecialtyId), // 숫자 형식으로 변환
+                product_name: productName,
+                description: description,
+                price: Number(price), // 숫자 형식으로 변환
+                stock: Number(stock) // 숫자 형식으로 변환
+            };
+
+            try {
+                const response = await fetch(`/store/${storeId}/product`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰 추가
+                    },
+                    body: JSON.stringify(createStoreProductDto)
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.text();
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json();
+                alert('상품이 등록되었습니다: ' + result.id); // 성공 메시지
+            } catch (error) {
+                console.error('Error registering product:', error);
+                alert('상품 등록에 실패했습니다: ' + error.message);
+            }
+        }
+
+        document.getElementById('registerButton').addEventListener('click', registerProduct);
+    </script>
+</body>
+
+</html>

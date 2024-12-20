@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>로그인</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', Arial, sans-serif;
+            background-color: #fff;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+            margin: 0;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .form-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 75px); /* 헤더 높이 제외 */
+        }
+
+        .form-container input {
+            margin: 10px 0;
+            padding: 10px;
+            width: 80%;
+            max-width: 400px;
+            background: #D9D9D9;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .form-container button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 200px;
+            background: #51FF00;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .form-container button:hover {
+            background: #45e000;
+        }
+
+        .hint {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: rgba(162, 150, 150, 0.72);
+        }
+
+        .hint a {
+            color: #000;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        /* 추가된 스타일 */
+        .container {
+            width: 100%; /* 전체 너비 */
+            height: 1024px;
+            position: relative;
+        }
+
+        .image {
+            width: 100%; /* 전체 너비 */
+            height: 556px;
+            position: absolute;
+            left: 0;
+            top: 234px;
+        }
+
+        .header {
+            width: 100%; /* 전체 너비 */
+            height: 75px;
+            position: absolute;
+            top: 0;
+            background: #51FF00;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .button {
+            height: 59px;
+            background: #51FF00;
+            color: black;
+            font-size: 32px;
+            font-family: Inter, sans-serif;
+            font-weight: 400;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+            flex: 1; /* 버튼이 균등하게 배치되도록 */
+            text-align: center; /* 텍스트 가운데 정렬 */
+        }
+
+        .button:hover {
+            background: #4CAF50; /* 버튼 호버 색상 */
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="nav">
+        <a href="homepage.loginbefore.html">Home</a>
+        <a href="storemain.loginbefore.html">상점</a>
+        <a href="local.loginbefore.html">특산물</a>
+        <a href="goods.list.loginbefore.html">상품 관리</a>
+    </nav>
+
+    <!-- Login Form -->
+    <div class="form-container">
+        <form id="loginForm">
+            <input type="email" id="email" name="email" placeholder="이메일" autocomplete="username" required>
+            <input type="password" id="password" name="password" placeholder="비밀번호" autocomplete="current-password" required>
+            <button type="submit">로그인</button>
+        </form>
+        <div class="hint">
+            계정이 없으신가요? <a href="register.html">회원가입</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+    
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault(); // 폼 기본 동작 방지
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+    
+            try {
+                const response = await fetch(`/user/sign-in`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                });
+    
+                if (response.ok) {
+                    const data = await response.json();
+                    const token = data.access_token;
+                    const userId = data.user_id; // 사용자 ID를 받아온다고 가정
+    
+                    // JWT 토큰과 사용자 ID를 로컬스토리지에 저장
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('userId', userId); // 사용자 ID 저장
+    
+                    alert('로그인 성공!');
+                    
+                    // 로그인 성공 후 리다이렉트
+                    window.location.href = '/homepage.loginafter.html';
+                } else {
+                    const error = await response.json();
+                    alert(error.message || '로그인에 실패했습니다.');
+                }
+            } catch (err) {
+                console.error('Error during login:', err);
+                alert('로그인 요청 중 오류가 발생했습니다.');
+            }
+        });
+    </script>
+</body>
+</html>

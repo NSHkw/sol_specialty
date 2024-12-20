@@ -6,6 +6,7 @@ import { LocalSpecialty } from './entities/local-specialty.entity';
 import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { User } from '../user/entities/user.entity';
+import { LocalSpecialtyRepository } from './local-specialty.repository';
 
 @Module({
   imports: [
@@ -14,7 +15,13 @@ import { User } from '../user/entities/user.entity';
     forwardRef(() => UserModule),
   ],
   controllers: [LocalSpecialtyController],
-  providers: [LocalSpecialtyService],
-  exports: [LocalSpecialtyService],
+  providers: [
+    LocalSpecialtyService,
+    {
+      provide: LocalSpecialtyRepository,
+      useClass: LocalSpecialtyRepository,
+    },
+  ],
+  exports: [LocalSpecialtyService, LocalSpecialtyRepository, TypeOrmModule],
 })
 export class LocalSpecialtyModule {}

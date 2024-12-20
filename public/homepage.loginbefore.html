@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>홈페이지</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Inter', Arial, sans-serif;
+        background-color: #fff;
+      }
+
+      .nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        height: 75px;
+        background-color: #51ff00;
+        margin: 0;
+      }
+
+      .nav a {
+        text-decoration: none;
+        color: black;
+        font-size: 1.2rem;
+        font-weight: 400;
+        padding: 10px 20px;
+        border: 1px solid transparent;
+      }
+
+      .nav a:hover {
+        border: 1px solid black;
+        border-radius: 5px;
+      }
+
+      .form-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: calc(100vh - 75px); /* 헤더 높이 제외 */
+      }
+
+      .form-container input {
+        margin: 10px 0;
+        padding: 10px;
+        width: 80%;
+        max-width: 400px;
+        background: #d9d9d9;
+        border: none;
+        border-radius: 5px;
+      }
+
+      .form-container button {
+        margin-top: 10px;
+        padding: 10px;
+        width: 200px;
+        background: #51ff00;
+        border: none;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 5px;
+      }
+
+      .form-container button:hover {
+        background: #45e000;
+      }
+
+      .hint {
+        margin-top: 15px;
+        font-size: 0.9rem;
+        color: rgba(162, 150, 150, 0.72);
+      }
+
+      .hint a {
+        color: #000;
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      /* 추가된 스타일 */
+      .container {
+        width: 100%; /* 전체 너비 */
+        height: 1024px;
+        position: relative;
+      }
+
+      .image {
+        width: 1500px; /* 전체 너비 */
+        height: 556px;
+        position: absolute;
+        left: 200px;
+        top: 234px;
+      }
+
+      .header {
+        width: 100%; /* 전체 너비 */
+        height: 75px;
+        position: absolute;
+        top: 0;
+        background: #51ff00;
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+      }
+
+      .button {
+        height: 59px;
+        background: #51ff00;
+        color: black;
+        font-size: 32px;
+        font-family: Inter, sans-serif;
+        font-weight: 400;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s;
+        flex: 1; /* 버튼이 균등하게 배치되도록 */
+        text-align: center; /* 텍스트 가운데 정렬 */
+      }
+
+      .button:hover {
+        background: #4caf50; /* 버튼 호버 색상 */
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100vh;
+        overflow: hidden;
+      }
+
+      .container {
+        display: flex;
+        width: 100%;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
+      }
+
+      .map-container {
+        flex: 1;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 40px;
+      }
+
+      .map-container h1 {
+        font-size: 32px;
+        margin-bottom: 40px;
+      }
+
+      #korea-map {
+        position: relative;
+        z-index: 1;
+      }
+
+      #korea-map path {
+        transition: all 0.3s ease;
+        transform-origin: center center;
+      }
+
+      #korea-map path:hover {
+        cursor: pointer;
+      }
+
+      .region-list {
+        width: 400px;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 0 60px;
+      }
+
+      .region-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 25px;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .region-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .region-info {
+        flex: 1;
+        margin-left: 20px;
+      }
+
+      .region-name {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #333;
+      }
+
+      .region-desc {
+        font-size: 15px;
+        color: #666;
+        line-height: 1.4;
+      }
+
+      .region-item:hover {
+        transform: translateX(5px);
+      }
+
+      .specialty-count {
+        font-size: 14px;
+        color: #777;
+        margin-top: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <a href="homepage.loginbefore.html">Home</a>
+      <a href="storemain.loginbefore.html">상점</a>
+      <a href="local.loginbefore.html">특산물</a>
+      <a href="goods.list.loginbefore.html">상품 관리</a>
+      <a href="login.html">로그인</a>
+    </nav>
+
+    <div class="container">
+      <div class="region-list left"></div>
+      <div class="map-container">
+        <h1>대한민국 지역별 특산품 지도</h1>
+        <object id="korea-map" type="image/svg+xml" data="/images/south-korea.svg"></object>
+      </div>
+      <div class="region-list right"></div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // 지역 데이터 정의
+        const regions = [
+          {
+            name: 'Gyeonggi',
+            korName: '경기도',
+            iconColor: '#3498db',
+            mapColor: '#3498db',
+            icon: '🏢',
+            description: '대한민국의 수도권 중심지입니다.',
+          },
+          {
+            name: 'Gangwon',
+            korName: '강원도',
+            iconColor: '#e74c3c',
+            mapColor: '#e74c3c',
+            icon: '⛰️',
+            description: '아름다운 산과 바다가 있는 관광의 중심지입니다.',
+          },
+          {
+            name: 'North Chungcheong',
+            korName: '충청북도',
+            iconColor: '#f1c40f',
+            mapColor: '#f1c40f',
+            icon: '⛰️',
+            description: '내륙 중심의 교통과 물류의 요충지입니다.',
+          },
+          {
+            name: 'South Chungcheong',
+            korName: '충청남도',
+            iconColor: '#27ae60',
+            mapColor: '#27ae60',
+            icon: '🌊',
+            description: '서해안의 수산업과 농업이 발달한 지역입니다.',
+          },
+          {
+            name: 'North Jeolla',
+            korName: '전라북도',
+            iconColor: '#9b59b6',
+            mapColor: '#9b59b6',
+            icon: '🍚',
+            description: '한국 전통 음식의 본고장입니다.',
+          },
+          {
+            name: 'South Jeolla',
+            korName: '전라남도',
+            iconColor: '#e67e22',
+            mapColor: '#e67e22',
+            icon: '🌾',
+            description: '비옥한 평야와 청정 해역을 보유한 지역입니다.',
+          },
+          {
+            name: 'North Gyeongsang',
+            korName: '경상북도',
+            iconColor: '#1abc9c',
+            mapColor: '#1abc9c',
+            icon: '⛰️',
+            description: '한국의 전통문화와 역사가 살아있는 곳입니다.',
+          },
+          {
+            name: 'South Gyeongsang',
+            korName: '경상남도',
+            iconColor: '#d35400',
+            mapColor: '#d35400',
+            icon: '🏠',
+            description: '항만 물류와 해양 관광의 중심지입니다.',
+          },
+          {
+            name: 'Jeju',
+            korName: '제주도',
+            iconColor: '#95a5a6',
+            mapColor: '#95a5a6',
+            icon: '🌴',
+            description: '아름다운 자연과 독특한 문화가 있는 관광의 섬입니다.',
+          },
+        ];
+
+        // 지역 이름 매핑 정의
+        const regionMapping = {
+          경기도: 'Gyeonggi',
+          강원도: 'Gangwon',
+          충청북도: 'North Chungcheong',
+          충청남도: 'South Chungcheong',
+          전라북도: 'North Jeolla',
+          전라남도: 'South Jeolla',
+          경상북도: 'North Gyeongsang',
+          경상남도: 'South Gyeongsang',
+          제주도: 'Jeju',
+        };
+
+        const leftList = document.querySelector('.region-list.left');
+        const rightList = document.querySelector('.region-list.right');
+
+        // 특산품 데이터 가져오기
+        async function fetchSpecialtyData() {
+          try {
+            const response = await fetch('/specialty', {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json',
+                'Cache-Control': 'no-cache',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+          } catch (error) {
+            console.error('Failed to fetch specialty data:', error);
+            return [];
+          }
+        }
+
+        // 지역별 특산품 개수 계산
+        function calculateRegionCounts(specialties) {
+          const counts = {};
+          specialties.forEach((item) => {
+            if (item.region && regionMapping[item.region]) {
+              const englishName = regionMapping[item.region];
+              counts[englishName] = (counts[englishName] || 0) + 1;
+            }
+          });
+          return counts;
+        }
+
+        // UI 엘리먼트 생성
+        function createRegionElement(region, specialtyCount) {
+          return `
+            <div class="region-item" data-region="${region.name}">
+              <div class="region-icon" style="background-color: ${region.iconColor}">
+                ${region.icon}
+              </div>
+              <div class="region-info">
+                <div class="region-name">${region.korName}</div>
+                <div class="region-desc">
+                  ${region.description}
+                  <div class="specialty-count">특산품: ${specialtyCount}개</div>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+
+        // UI 업데이트
+        async function updateUI() {
+          try {
+            // 특산품 데이터 가져오기
+            const specialties = await fetchSpecialtyData();
+
+            // 지역별 특산품 개수 계산
+            const regionCounts = calculateRegionCounts(specialties);
+
+            // 리스트 초기화
+            leftList.innerHTML = '';
+            rightList.innerHTML = '';
+
+            // 지역 목록 생성
+            regions.forEach((region, index) => {
+              const specialtyCount = regionCounts[region.name] || 0;
+              const regionElement = createRegionElement(region, specialtyCount);
+
+              if (index < Math.ceil(regions.length / 2)) {
+                leftList.innerHTML += regionElement;
+              } else {
+                rightList.innerHTML += regionElement;
+              }
+            });
+
+            return regions.map((region) => ({
+              ...region,
+              specialtyCount: regionCounts[region.name] || 0,
+            }));
+          } catch (error) {
+            console.error('Error updating UI:', error);
+            return regions.map((region) => ({ ...region, specialtyCount: 0 }));
+          }
+        }
+
+        // 지도 초기화 및 이벤트 설정
+        const svgObject = document.getElementById('korea-map');
+        svgObject.addEventListener('load', function () {
+          const svgDoc = svgObject.contentDocument;
+          const paths = svgDoc.querySelectorAll('path');
+
+          updateUI().then((updatedRegions) => {
+            paths.forEach((path) => {
+              const region = updatedRegions.find((r) => r.name === path.getAttribute('title'));
+              if (region) {
+                path.style.fill = region.mapColor;
+                path.style.stroke = '#FFFFFF';
+                path.style.strokeWidth = '1';
+
+                path.addEventListener('mouseover', () => {
+                  path.style.opacity = '0.7';
+                });
+
+                path.addEventListener('mouseout', () => {
+                  path.style.opacity = '1';
+                });
+              }
+            });
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

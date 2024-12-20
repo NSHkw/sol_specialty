@@ -1,21 +1,14 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  ParseIntPipe,
-} from '@nestjs/common';
+// src/cart-item/cart-item.controller.ts
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { CartItemService } from './cart-item.service';
 import { CreateCartItemDto } from './dto/create-cart-item.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { User } from 'src/user/entities/user.entity';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { User } from '../user/entities/user.entity';
+import { GetUser } from '../common/decorators/get-user.decorator';
 import { UpdateCartItemDto } from './dto/update-cart-item.dto';
+import { CartItem } from './entities/cart-item.entity';
+import { CartItemResponse } from './types/cart-item.type';
 
 @ApiTags('CartItem')
 @ApiBearerAuth('access-token')
@@ -23,40 +16,38 @@ import { UpdateCartItemDto } from './dto/update-cart-item.dto';
 export class CartItemController {
   constructor(private readonly cartItemService: CartItemService) {}
 
-  // 장바구니에 물품 추가하기, 장바구니 모든 물품 조회하기, 장바구니 물품 삭제하기
-
   // 장바구니에 물품 추가하기
-  // param에 store_id도 추가해야 할 것 같음
   @Post(':store_id')
   @UseGuards(JwtAuthGuard)
   async create(
     @GetUser() user: User,
     @Param('store_id') store_id: number,
     @Body() createCartItemDto: CreateCartItemDto,
-  ) {
-    return this.cartItemService.create(user, store_id, createCartItemDto);
+  ): Promise<CartItem> {
+    return this.cartItemService.putInCart(user, store_id, createCartItemDto);
   }
 
   // 장바구니 모든 물품 조회하기
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(@GetUser() user: User) {
-    return this.cartItemService.findAll(user);
+  async findAll(@GetUser() user: User): Promise<CartItem[]> {
+    return await this.cartItemService.findAll(user);
+  }
+
+  // 장바구니 내 물품 개수 수정하기
+  @Patch(':id')
+  async update(
+    @GetUser() user: User,
+    @Param('id') id: number,
+    @Body() updateCartItemDto: UpdateCartItemDto,
+  ): Promise<CartItem> {
+    return await this.cartItemService.update(user, id, updateCartItemDto);
   }
 
   // 장바구니 물품 삭제하기
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@GetUser() user: User, @Param('id') id: number) {
+  remove(@GetUser() user: User, @Param('id') id: number): Promise<CartItemResponse> {
     return this.cartItemService.remove(user, id);
-  }
-
-  @Patch(':id')
-  update(
-    @GetUser() user: User,
-    @Param('id') id: number,
-    @Body() updateCartItemDto: UpdateCartItemDto,
-  ) {
-    return this.cartItemService.update(user, id, updateCartItemDto);
   }
 }

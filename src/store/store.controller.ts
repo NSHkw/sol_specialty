@@ -1,15 +1,18 @@
-import { HttpCode, HttpStatus, Query } from '@nestjs/common';
+// src/store/store.controller.ts
+import { HttpCode, HttpStatus } from '@nestjs/common';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
 import { UpdateStoreDto } from './dto/update-store.dto';
-import { ApiBearerAuth, ApiQuery, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/auth/guards/roles.guard';
-import { User, UserRole } from 'src/user/entities/user.entity';
-import { Roles } from 'src/common/decorators/roles.decorator';
-import { GetUser } from 'src/common/decorators/get-user.decorator';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { User, UserRole } from '../user/entities/user.entity';
+import { Roles } from '../common/decorators/roles.decorator';
+import { GetUser } from '../common/decorators/get-user.decorator';
 import { SearchStoreDto } from './dto/search-store.dto';
+import { SearchResult, StoreBaseInfo, StoreDetailInfo, StoreResponse } from './types/store.type';
+import { Store } from './entities/store.entity';
 
 @ApiTags('Store')
 @ApiBearerAuth('access-token')
@@ -24,7 +27,10 @@ export class StoreController {
   @Roles(UserRole.SELLER)
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@GetUser() user: User, @Body() createStoreDto: CreateStoreDto) {
+  async create(
+    @GetUser() user: User,
+    @Body() createStoreDto: CreateStoreDto,
+  ): Promise<StoreResponse<Store>> {
     return this.storeService.createStore(user, createStoreDto);
   }
 
@@ -37,8 +43,8 @@ export class StoreController {
     @Param('id') id: number,
     @Body() updateStoreDto: UpdateStoreDto,
     @GetUser() user: User,
-  ) {
-    return this.storeService.updateStore(id, user, updateStoreDto);
+  ): Promise<StoreResponse> {
+    return this.storeService.updateStoreInfo(id, user, updateStoreDto);
   }
 
   // 상점 삭제
@@ -46,33 +52,31 @@ export class StoreController {
   @Roles(UserRole.SELLER)
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id') id: number, @GetUser() user: User) {
+  async delete(@Param('id') id: number, @GetUser() user: User): Promise<StoreResponse> {
     return this.storeService.deleteStore(id, user);
   }
 
   // 상점 검색
   @Post('search')
-  async search(@Body() searchDto: SearchStoreDto) {
-    return this.storeService.search(searchDto);
+  async search(@Body() searchDto: SearchStoreDto): Promise<SearchResult> {
+    return this.storeService.searchStore(searchDto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get(':userId/storeid')
+  async getStoreByUserId(@Param('userId') userId: number): Promise<Store> {
+    return this.storeService.findStoreByUserId(userId);
   }
 
   // 사이트에 존재하는 모든 상점 조회
   @Get()
-  async findAllStores() {
+  async findAllStores(): Promise<StoreBaseInfo[]> {
     return this.storeService.findAllStores();
   }
 
   // 특정 상점 상세 조회
   @Get(':id')
-  async findById(@Param('id') id: number) {
-    return this.storeService.findStoreById(id);
-  }
-
-  // 상점 판매량 확인
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.SELLER)
-  @Get(':id/sales')
-  async checkStoreSales(@Param('id') id: number) {
-    return this.storeService.checkStoreSales(id);
+  async findById(@Param('id') id: number): Promise<StoreDetailInfo> {
+    return this.storeService.findStoreByStoreId(id);
   }
 }

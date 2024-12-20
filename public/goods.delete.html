@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품 삭제</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 75px);
+            background: white;
+        }
+
+        .Mypagebar {
+            width: 285px;
+            height: 100%;
+            background: white;
+            border: 1px black solid;
+        }
+
+        .menu-text {
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 32px;
+            font-weight: 600;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .info-container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            background-color: #FF4C4C; /* 빨간색 버튼 */
+            border: none;
+            color: white;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="homepage.loginafter.html">Home</a>
+        <a href="storemain.loginafter.html">상점</a>
+        <a href="local.loginafter.html">특산물</a>
+        <a href="goods.list.loginafter.html">상품 관리</a>
+        <a href="mypage.html">마이페이지</a>
+        <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
+    </div>
+
+    <div class="container">
+        <div class="Mypagebar">
+            <div class="menu-text">
+                <a class="menu-text" href="goods.list.loginafter.html">상품 목록</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="goods.register.html">상품 등록</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="goods.correction.html">상품 수정</a>
+            </div>
+            <div class="menu-text">
+                <a class="menu-text" href="goods.delete.html">상품 삭제</a>
+            </div>
+        </div>
+
+        <div class="info-container">
+            <div class="label">상품 ID</div>
+            <input type="number" class="info-box" id="productId" placeholder="삭제할 상품 ID를 입력하세요" required>
+            <button class="delete-button" id="deleteButton">삭제</button>
+        </div>
+    </div>
+
+    <script>
+        let storeId; // 상점 ID를 저장할 전역 변수
+
+        function logout() {
+            localStorage.removeItem('token'); // 토큰 삭제
+            localStorage.removeItem('userId'); // 사용자 ID 삭제
+            window.location.href = 'homepage.loginbefore.html'; // 로그인 페이지로 리다이렉트
+        }
+
+        // 로그아웃 버튼 클릭 시 logout 함수 호출
+        document.getElementById('logoutButton').addEventListener('click', function (event) {
+            event.preventDefault(); // 기본 링크 클릭 동작 방지
+            logout(); // logout 함수 호출
+        });
+
+        async function fetchStoreId() {
+            const userId = localStorage.getItem('userId');
+
+            if (!userId) {
+                console.error('사용자 ID가 로컬 스토리지에 없습니다.');
+                alert('사용자 ID가 필요합니다.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/store/${userId}/storeid`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰을 헤더에 추가
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('상점 ID를 가져오는 데 실패했습니다.');
+                }
+
+                const result = await response.json(); // 상점 ID 가져오기
+                storeId = result.storeId; // 전역 변수에 storeId 저장
+            } catch (error) {
+                console.error('Error fetching store ID:', error);
+                alert('상점 ID를 가져오는 데 오류가 발생했습니다.');
+            }
+        }
+
+        async function deleteProduct() {
+            const productId = document.getElementById('productId').value;
+
+            if (!productId) {
+                alert('삭제할 상품 ID를 입력하세요.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/store/${storeId}/product/${productId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('token'), // JWT 토큰 추가
+                    },
+                });
+
+                if (!response.ok) {
+                    const errorMessage = await response.text();
+                    throw new Error(errorMessage);
+                }
+
+                const result = await response.json(); // 응답을 JSON으로 파싱
+                alert(result.message); // 성공 메시지 표시
+            } catch (error) {
+                console.error('Error deleting product:', error);
+                alert('상품 삭제에 실패했습니다: ' + error.message);
+            }
+        }
+
+        document.getElementById('deleteButton').addEventListener('click', deleteProduct);
+
+        // 페이지가 로드될 때 상점 ID 가져오기
+        window.onload = fetchStoreId;
+    </script>
+</body>
+
+</html>

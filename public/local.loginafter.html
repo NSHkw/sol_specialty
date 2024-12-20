@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>특산물 검색</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 75px;
+            background-color: #51FF00;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: black;
+            font-size: 1.2rem;
+            font-weight: 400;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+        }
+
+        .nav a:hover {
+            border: 1px solid black;
+            border-radius: 5px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            height: calc(100vh - 75px);
+            background: white;
+        }
+
+        .Mypagebar {
+            width: 285px;
+            height: 100%;
+            background: white;
+            border: 1px black solid;
+        }
+
+        .menu-text {
+            width: 100%;
+            text-align: center;
+            color: black;
+            font-size: 32px;
+            font-weight: 600;
+            padding: 15px 0;
+            cursor: pointer;
+        }
+
+        .screen {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-y: auto;
+        }
+
+        #container1 {
+            display: flex;
+            flex-wrap: wrap; /* 자동으로 줄 바꿈 */
+            justify-content: space-between; /* 요소 사이에 공간 배치 */
+            width: 100%;
+            max-height: calc(100vh - 150px); /* 헤더와 여백을 고려한 최대 높이 */
+        }
+
+        .Group1 {
+            flex: 1 1 calc(30% - 20px); /* 3개 열로 배치, 여백 포함 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .title {
+            color: black;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        .description {
+            width: 100%;
+            word-wrap: break-word;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: 60px;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            margin: 5px 0;
+        }
+
+        img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        #specialtyDetailContainer {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* 미디어 쿼리 추가 */
+        @media (max-width: 768px) {
+            .Group1 {
+                flex: 1 1 calc(45% - 20px); /* 모바일에서는 2개 열로 배치 */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .Group1 {
+                flex: 1 1 100%; /* 모바일에서는 1개 열로 배치 */
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="homepage.loginafter.html">Home</a>
+        <a href="storemain.loginafter.html">상점</a>
+        <a href="local.loginafter.html">특산물</a>
+        <a href="goods.list.loginafter.html">상품 관리</a>
+        <a href="mypage.html">마이페이지</a>
+        <a href="homepage.loginbefore.html" id="logoutButton">로그아웃</a>
+    </div>
+
+    <div class="container">
+        <div class="Mypagebar">
+            <div class="menu-text">
+                <a class="menu-text" href="local.loginbefore.html">특산물 검색</a>
+            </div>
+        </div>
+
+        <div class="screen">
+            <div id="regionButtons">
+                <button onclick="filterByRegion('서울')">서울</button>
+                <button onclick="filterByRegion('부산')">부산</button>
+                <button onclick="filterByRegion('대구')">대구</button>
+                <button onclick="filterByRegion('인천')">인천</button>
+                <button onclick="filterByRegion('광주')">광주</button>
+                <button onclick="filterByRegion('대전')">대전</button>
+                <button onclick="filterByRegion('울산')">울산</button>
+                <button onclick="filterByRegion('세종')">세종</button>
+                <button onclick="filterByRegion('경기')">경기</button>
+                <button onclick="filterByRegion('강원')">강원</button>
+                <button onclick="filterByRegion('충북')">충북</button>
+                <button onclick="filterByRegion('충남')">충남</button>
+                <button onclick="filterByRegion('전북')">전북</button>
+                <button onclick="filterByRegion('전남')">전남</button>
+                <button onclick="filterByRegion('경북')">경북</button>
+                <button onclick="filterByRegion('경남')">경남</button>
+                <button onclick="filterByRegion('제주')">제주</button>
+            </div>
+            <div class="label">검색</div>
+            <input type="text" id="nickname" class="info-box Nicknamebox" placeholder="이름을 입력하세요">
+            <button id="searchButton">검색</button>
+            <div id="container1">
+                <!-- 검색 결과가 여기에 나타납니다. -->
+            </div>
+        </div>
+        <div id="specialtyDetailContainer">
+            <!-- 상세 정보가 여기에 나타납니다. -->
+        </div>
+    </div>
+
+    javascript
+
+
+    <script>
+        async function fetchLocalSpecialties(keyword) {
+            try {
+                const response = await fetch('/specialty/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ keyword: keyword })
+                });
+    
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+    
+                const data = await response.json();
+                const container = document.getElementById('container1');
+                const detailContainer = document.getElementById('specialtyDetailContainer');
+    
+                container.innerHTML = ''; // 기존 내용 삭제
+                detailContainer.innerHTML = ''; // 상세 정보 초기화
+    
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const group = document.createElement('div');
+                        group.className = 'Group1';
+    
+                        // 클릭 이벤트 추가
+                        group.innerHTML = `
+                            <a href="#" onclick="fetchSpecialtyDetail(${item.id}); return false;"> <!-- 상세 정보 페이지 링크 -->
+                                <img src="${item.image || 'https://via.placeholder.com/600x200'}" alt="${item.name}" />
+                                <div class="title title-name">${item.name}</div>
+                                <div class="description title-description">${item.description}</div>
+                                <div class="title title-season1">${item.season_info.join(', ')}</div>
+                                <div class="title title-region">${item.region}</div>
+                            </a>
+                        `;
+    
+                        container.appendChild(group);
+                    });
+                } else {
+                    container.innerHTML = '<div class="title">결과가 없습니다.</div>';
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+    
+        async function fetchSpecialtyDetail(id) {
+            try {
+                const response = await fetch(`/specialty/${id}`);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+    
+                const specialty = await response.json();
+                const container = document.getElementById('specialtyDetailContainer');
+    
+                container.innerHTML = `
+                    <h1>${specialty.name}</h1>
+                    <img src="${specialty.image || 'https://via.placeholder.com/600x200'}" alt="${specialty.name}" />
+                    <div>${specialty.description}</div>
+                    <div>시즌: ${specialty.season_info.join(', ')}</div>
+                    <div>지역: ${specialty.region}</div>
+                `;
+            } catch (error) {
+                console.error('Error fetching specialty detail:', error);
+            }
+        }
+    
+        async function filterByRegion(region) {
+            if (region) {
+                fetchLocalSpecialties(region); // 지역에 맞춰 데이터 가져오기
+            }
+        }
+    
+        window.onload = () => {
+            document.getElementById('searchButton').addEventListener('click', () => {
+                const keyword = document.getElementById('nickname').value.trim();
+                if (keyword) { // 입력 필드가 비어있지 않은 경우에만 검색
+                    fetchLocalSpecialties(keyword); // 입력한 검색어에 맞춰 데이터 가져오기
+                } else {
+                    alert('검색어를 입력해주세요.'); // 경고 메시지 추가
+                }
+            });
+    
+            // 지역 버튼 클릭 이벤트 추가
+            const regionButtons = document.querySelectorAll('#regionButtons button');
+            regionButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const region = button.innerText; // 버튼의 텍스트를 지역으로 사용
+                    filterByRegion(region);
+                });
+            });
+    
+            // Enter 키 입력 감지
+            document.getElementById('nickname').addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    const keyword = document.getElementById('nickname').value.trim();
+                    if (keyword) { // 입력 필드가 비어있지 않은 경우에만 검색
+                        fetchLocalSpecialties(keyword); // 입력한 검색어에 맞춰 데이터 가져오기
+                    } else {
+                        alert('검색어를 입력해주세요.'); // 경고 메시지 추가
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+
+</html>

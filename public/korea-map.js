@@ -65,60 +65,88 @@ document.addEventListener('DOMContentLoaded', function () {
     },
   ];
 
-  // 광역시 색상 설정 추가
   const metropolitanCities = [
-    { id: 'KR-28', color: '#3498db' }, // 인천 (경기도 색)
-    { id: 'KR-30', color: '#27ae60' }, // 대전 (충남 색)
-    { id: 'KR-29', color: '#e67e22' }, // 광주 (전남 색)
-    { id: 'KR-27', color: '#1abc9c' }, // 대구 (경북 색)
-    { id: 'KR-31', color: '#d35400' }, // 울산 (경남 색)
-    { id: 'KR-26', color: '#d35400' }, // 부산 (경남 색)
+    { id: 'KR-28', color: '#3498db' },
+    { id: 'KR-30', color: '#27ae60' },
+    { id: 'KR-29', color: '#e67e22' },
+    { id: 'KR-27', color: '#1abc9c' },
+    { id: 'KR-31', color: '#d35400' },
+    { id: 'KR-26', color: '#d35400' },
   ];
 
-  // 좌우 지역 목록 생성
   const leftList = document.querySelector('.region-list.left');
   const rightList = document.querySelector('.region-list.right');
 
   regions.forEach((region, index) => {
     const regionElement = `
+      <div class="region-item" data-region="${region.name}">
+        <div class="region-icon" style="background-color: ${region.color}">
+          ${region.icon}
+        </div>
+        <div class="region-info">
+          <div class="region-name">${region.korName}</div>
+          <div class="region-desc">${region.description}</div>
+        </div>
+      </div>
+    `;
 
-            <div class="region-item">
-                <div class="region-icon" style="background-color: ${region.color}">
-                    ${region.icon}
-                </div>
-                <div class="region-info">
-                    <div class="region-name">${region.korName}</div>
-                    <div class="region-desc">${region.description}</div>
-                </div>
-            </div>
-        `;
+    const listElement = index < regions.length / 2 ? leftList : rightList;
+    listElement.innerHTML += regionElement;
+  });
 
-    // SVG 지도 색상 설정
-    const svgObject = document.getElementById('korea-map');
-    svgObject.addEventListener('load', function () {
-      const svgDoc = svgObject.contentDocument;
-      const paths = svgDoc.querySelectorAll('path');
+  const svgObject = document.getElementById('korea-map');
+  svgObject.addEventListener('load', function () {
+    const svgDoc = this.contentDocument;
+    const paths = svgDoc.querySelectorAll('path');
 
-      paths.forEach((path) => {
-        const pathId = path.getAttribute('id');
-        const region = regions.find((r) => r.name === path.getAttribute('title'));
-        const metro = metropolitanCities.find((m) => m.id === pathId);
+    // SVG 지도 초기화
+    paths.forEach((path) => {
+      const pathId = path.getAttribute('id');
+      const region = regions.find((r) => r.name === path.getAttribute('title'));
+      const metro = metropolitanCities.find((m) => m.id === pathId);
 
-        if (region) {
-          path.style.fill = region.color;
-        } else if (metro) {
-          path.style.fill = metro.color;
-        }
+      if (region) {
+        path.style.fill = region.color;
+        path.setAttribute('data-region', region.name);
+      } else if (metro) {
+        path.style.fill = metro.color;
+        path.setAttribute('data-region', metro.id);
+      }
 
-        path.style.stroke = '#FFFFFF';
-        path.style.strokeWidth = '1';
+      path.style.stroke = '#FFFFFF';
+      path.style.strokeWidth = '1';
+
+      // 지도 영역 호버 효과
+      path.addEventListener('mouseover', function() {
+        const originalColor = this.style.fill;
+        this.setAttribute('data-original-color', originalColor);
+        this.style.fill = '#FFFFFF';
+      });
+
+      path.addEventListener('mouseout', function() {
+        const originalColor = this.getAttribute('data-original-color');
+        this.style.fill = originalColor;
       });
     });
 
-    // 좌우 목록에 지역 추가
-    regions.forEach((region, index) => {
-      const listElement = index < regions.length / 2 ? leftList : rightList;
-      listElement.innerHTML += regionElement;
+    // 지역 아이콘 호버 효과
+    // 경기도 아이콘 영역에 대한 이벤트 리스너
+document.querySelector('.region-item[data-region="Gyeonggi"]').addEventListener('mouseover', function() {
+  const svgDoc = document.getElementById('korea-map').contentDocument;
+  const path = svgDoc.querySelector('path[title="Gyeonggi"]');
+  if (path) {
+    path.setAttribute('data-original-color', path.style.fill);
+    path.style.fill = '#FFFFFF';
+  }
+});
+
+document.querySelector('.region-item[data-region="Gyeonggi"]').addEventListener('mouseout', function() {
+  const svgDoc = document.getElementById('korea-map').contentDocument;
+  const path = svgDoc.querySelector('path[title="Gyeonggi"]');
+  if (path) {
+    path.style.fill = path.getAttribute('data-original-color');
+  }
+});
+
     });
   });
-});
