@@ -99,6 +99,12 @@
       .region-item:hover {
         transform: translateX(5px);
       }
+
+      .specialty-count {
+        font-size: 14px;
+        color: #777;
+        margin-top: 5px;
+      }
     </style>
   </head>
   <body>
@@ -110,8 +116,10 @@
       </div>
       <div class="region-list right"></div>
     </div>
+
     <script>
       document.addEventListener('DOMContentLoaded', function () {
+        // 지역 데이터 정의
         const regions = [
           {
             name: 'Gyeonggi',
@@ -177,7 +185,6 @@
             icon: '🏠',
             description: '항만 물류와 해양 관광의 중심지입니다.',
           },
-
           {
             name: 'Jeju',
             korName: '제주도',
@@ -188,66 +195,133 @@
           },
         ];
 
+        // 지역 이름 매핑 정의
+        const regionMapping = {
+          경기도: 'Gyeonggi',
+          강원도: 'Gangwon',
+          충청북도: 'North Chungcheong',
+          충청남도: 'South Chungcheong',
+          전라북도: 'North Jeolla',
+          전라남도: 'South Jeolla',
+          경상북도: 'North Gyeongsang',
+          경상남도: 'South Gyeongsang',
+          제주도: 'Jeju',
+        };
+
         const leftList = document.querySelector('.region-list.left');
         const rightList = document.querySelector('.region-list.right');
 
-        regions.forEach((region, index) => {
-          const regionElement = `
+        // 특산품 데이터 가져오기
+        async function fetchSpecialtyData() {
+          try {
+            const response = await fetch('/specialty', {
+              method: 'GET',
+              headers: {
+                Accept: 'application/json',
+                'Cache-Control': 'no-cache',
+              },
+            });
+
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data;
+          } catch (error) {
+            console.error('Failed to fetch specialty data:', error);
+            return [];
+          }
+        }
+
+        // 지역별 특산품 개수 계산
+        function calculateRegionCounts(specialties) {
+          const counts = {};
+          specialties.forEach((item) => {
+            if (item.region && regionMapping[item.region]) {
+              const englishName = regionMapping[item.region];
+              counts[englishName] = (counts[englishName] || 0) + 1;
+            }
+          });
+          return counts;
+        }
+
+        // UI 엘리먼트 생성
+        function createRegionElement(region, specialtyCount) {
+          return `
             <div class="region-item" data-region="${region.name}">
               <div class="region-icon" style="background-color: ${region.iconColor}">
                 ${region.icon}
               </div>
               <div class="region-info">
                 <div class="region-name">${region.korName}</div>
-                <div class="region-desc">${region.description}</div>
+                <div class="region-desc">
+                  ${region.description}
+                  <div class="specialty-count">특산품: ${specialtyCount}개</div>
+                </div>
               </div>
             </div>
           `;
+        }
 
-          if (index < Math.ceil(regions.length / 2)) {
-            leftList.innerHTML += regionElement;
-          } else {
-            rightList.innerHTML += regionElement;
+        // UI 업데이트
+        async function updateUI() {
+          try {
+            // 특산품 데이터 가져오기
+            const specialties = await fetchSpecialtyData();
+            console.log('Fetched specialties:', specialties);
+
+            // 지역별 특산품 개수 계산
+            const regionCounts = calculateRegionCounts(specialties);
+            console.log('Region counts:', regionCounts);
+
+            // 리스트 초기화
+            leftList.innerHTML = '';
+            rightList.innerHTML = '';
+
+            // 지역 목록 생성
+            regions.forEach((region, index) => {
+              const specialtyCount = regionCounts[region.name] || 0;
+              const regionElement = createRegionElement(region, specialtyCount);
+
+              if (index < Math.ceil(regions.length / 2)) {
+                leftList.innerHTML += regionElement;
+              } else {
+                rightList.innerHTML += regionElement;
+              }
+            });
+
+            return regions.map((region) => ({
+              ...region,
+              specialtyCount: regionCounts[region.name] || 0,
+            }));
+          } catch (error) {
+            console.error('Error updating UI:', error);
+            return regions.map((region) => ({ ...region, specialtyCount: 0 }));
           }
-        });
+        }
 
+        // 지도 초기화 및 이벤트 설정
         const svgObject = document.getElementById('korea-map');
         svgObject.addEventListener('load', function () {
           const svgDoc = svgObject.contentDocument;
           const paths = svgDoc.querySelectorAll('path');
 
-          paths.forEach((path) => {
-            const region = regions.find((r) => r.name === path.getAttribute('title'));
-            if (region) {
-              path.style.fill = region.mapColor;
-              path.style.stroke = '#FFFFFF';
-              path.style.strokeWidth = '1';
+          updateUI().then((updatedRegions) => {
+            paths.forEach((path) => {
+              const region = updatedRegions.find((r) => r.name === path.getAttribute('title'));
+              if (region) {
+                path.style.fill = region.mapColor;
+                path.style.stroke = '#FFFFFF';
+                path.style.strokeWidth = '1';
 
-              // 지도 호버 효과
-              path.addEventListener('mouseover', () => {
-                path.style.opacity = '0.7';
-              });
-              path.addEventListener('mouseout', () => {
-                path.style.opacity = '1';
-              });
-            }
-          });
+                path.addEventListener('mouseover', () => {
+                  path.style.opacity = '0.7';
+                });
 
-          // 지역 아이템 호버 효과
-          document.querySelectorAll('.region-item').forEach(item => {
-            const regionName = item.getAttribute('data-region');
-            
-            item.addEventListener('mouseover', function() {
-              const path = svgDoc.querySelector(`path[title="${regionName}"]`);
-              if (path) {
-                path.style.opacity = '0.7';
-              }
-            });
-            
-            item.addEventListener('mouseout', function() {
-              const path = svgDoc.querySelector(`path[title="${regionName}"]`);
-              if (path) {
-                path.style.opacity = '1';
+                path.addEventListener('mouseout', () => {
+                  path.style.opacity = '1';
+                });
               }
             });
           });
