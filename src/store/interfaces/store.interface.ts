@@ -8,7 +8,7 @@ import { SearchResult, StoreBaseInfo, StoreDetailInfo, StoreResponse } from '../
 export interface StoreInterface {
   createStore(user: User, createStoreDto: CreateStoreDto): Promise<StoreResponse<Store>>;
 
-  findStoreByUserId(user_id: number): Promise<Store>;
+  findStoreByUserId(user_id: number): Promise<{ id: number }>;
 
   updateStoreInfo(
     store_id: number,

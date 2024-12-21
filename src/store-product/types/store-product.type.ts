@@ -12,8 +12,10 @@ export type StoreProductQuery = {
 export type StoreProductSelect = {
   id: boolean;
   product_name: boolean;
+  description: boolean;
   price: boolean;
   grade: boolean;
+  stock: boolean;
   type: boolean;
   local_specialty?: {
     id: boolean;

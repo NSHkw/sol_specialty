@@ -1,5 +1,5 @@
 // src/store/store.controller.ts
-import { HttpCode, HttpStatus } from '@nestjs/common';
+import { HttpCode, HttpStatus, ParseIntPipe } from '@nestjs/common';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { StoreService } from './store.service';
 import { CreateStoreDto } from './dto/create-store.dto';
@@ -40,7 +40,7 @@ export class StoreController {
   @Patch(':id')
   @HttpCode(HttpStatus.OK)
   async update(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateStoreDto: UpdateStoreDto,
     @GetUser() user: User,
   ): Promise<StoreResponse> {
@@ -52,7 +52,10 @@ export class StoreController {
   @Roles(UserRole.SELLER)
   @Delete(':id')
   @HttpCode(HttpStatus.OK)
-  async delete(@Param('id') id: number, @GetUser() user: User): Promise<StoreResponse> {
+  async delete(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: User,
+  ): Promise<StoreResponse> {
     return this.storeService.deleteStore(id, user);
   }
 
@@ -64,7 +67,7 @@ export class StoreController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Get(':userId/storeid')
-  async getStoreByUserId(@Param('userId') userId: number): Promise<Store> {
+  async getStoreByUserId(@Param('userId', ParseIntPipe) userId: number): Promise<{ id: number }> {
     return this.storeService.findStoreByUserId(userId);
   }
 
@@ -76,7 +79,7 @@ export class StoreController {
 
   // 특정 상점 상세 조회
   @Get(':id')
-  async findById(@Param('id') id: number): Promise<StoreDetailInfo> {
+  async findById(@Param('id', ParseIntPipe) id: number): Promise<StoreDetailInfo> {
     return this.storeService.findStoreByStoreId(id);
   }
 }

@@ -55,8 +55,8 @@ export class LocalSpecialtyRepository {
 
     if (id) whereConditions.id = id;
     if (region) whereConditions.region = region;
-    if (customConditions?.keyword) {
-      whereConditions.name = Like(`%${customConditions.keyword}%`);
+    if (customConditions?.name) {
+      whereConditions.name = Like(`%${customConditions.name}%`);
     }
     if (customConditions?.region) {
       whereConditions.region = customConditions.region;

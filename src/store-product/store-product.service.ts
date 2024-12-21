@@ -1,5 +1,5 @@
 // src/store-product/store-product.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStoreProductDto } from './dto/create-store-product.dto';
 import { UpdateStoreProductDto } from './dto/update-store-product.dto';
 import { User } from '../user/entities/user.entity';
@@ -63,13 +63,15 @@ export class StoreProductService implements StoreProductInterface {
    * @returns
    */
   async findOneProductInStore(product_id: number, store_id: number): Promise<StoreProduct> {
+    this.storeProductValidator.validateIds({ product_id, store_id }, ['product_id', 'store_id']);
+
     const product = await this.storeProductRepository.findOne({
       id: product_id,
       store_id: store_id,
     });
 
     if (!product) {
-      throw new NotFoundException('상점 내 상품 존재 X');
+      throw new NotFoundException('해당 상점에서 상품을 찾을 수 없습니다.');
     }
 
     return product;
@@ -91,19 +93,39 @@ export class StoreProductService implements StoreProductInterface {
   ): Promise<StoreProductResponse<StoreProduct>> {
     AuthUtils.validateLogin(user);
 
-    await this.storeProductValidator.validateStoreProduct(store_id, user.id, product_id);
+    this.storeProductValidator.validateIds({ product_id, store_id, user_id: user.id }, [
+      'product_id',
+      'store_id',
+      'user_id',
+    ]);
 
     const product = await this.findOneProductInStore(product_id, store_id);
-    const { stock } = updateStoreProductDto;
+    await this.storeProductValidator.validateStoreProduct(
+      store_id,
+      user.id,
+      product.local_specialty_id,
+    );
 
-    await this.storeProductRepository.update(product_id, {
-      ...updateStoreProductDto,
-      sold_out: stock !== undefined ? stock <= 0 : product.sold_out,
-    });
+    await this.storeProductValidator.validateStoreProduct(store_id, user.id, product_id);
+
+    const { stock, ...updateData } = updateStoreProductDto;
+
+    const updates: Partial<StoreProduct> = {
+      ...updateData,
+      ...(stock !== undefined && {
+        stock,
+        sold_out: stock <= 0,
+      }),
+    };
+
+    await this.storeProductRepository.update(product_id, updates);
 
     const updatedProduct = await this.findOneProductInStore(product_id, store_id);
 
-    return { message: `${product.product_name}상품 수정 완료`, data: updatedProduct };
+    return {
+      message: `${updatedProduct.product_name} 상품이 수정되었습니다.`,
+      data: updatedProduct,
+    };
   }
 
   /**

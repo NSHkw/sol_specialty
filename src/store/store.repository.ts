@@ -25,6 +25,9 @@ export class StoreRepository {
 
   async search(keyword: string, page: number, limit: number): Promise<SearchResult> {
     try {
+      const validPage = Math.max(1, Number(page) || 1);
+      const validLimit = Math.max(1, Math.min(Number(limit) || 10, 100));
+
       const query = this.storeRepository
         .createQueryBuilder('store')
         .leftJoinAndSelect('store.store_products', 'store_products')

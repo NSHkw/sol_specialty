@@ -35,11 +35,22 @@ export class ReviewRepository {
         store_id,
         deleted_at: null,
       },
-      relations: ['user'],
+      relations: ['user', 'store'], // store 관계 추가
       select: {
         id: true,
         rating: true,
-        user: { id: true, nickname: true },
+        content: true,
+        user: {
+          id: true,
+          nickname: true,
+        },
+        store: {
+          id: true,
+          name: true,
+        },
+      },
+      order: {
+        created_at: 'DESC',
       },
     });
   }

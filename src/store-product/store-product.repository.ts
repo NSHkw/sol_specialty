@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StoreProduct } from './entities/store-product.entity';
 import { FindOneOptions, Repository } from 'typeorm';
@@ -20,7 +20,9 @@ export class StoreProductRepository {
     const select: StoreProductSelect = {
       id: true,
       product_name: true,
+      description: true,
       price: true,
+      stock: true,
       grade: true,
       type: true,
       local_specialty: {
@@ -36,14 +38,15 @@ export class StoreProductRepository {
     });
   }
 
-  async findOne(
-    query: StoreProductQuery,
-    options: Partial<FindOneOptions<StoreProduct>> = {},
-  ): Promise<StoreProduct | null> {
+  async findOne(query: StoreProductQuery): Promise<StoreProduct | null> {
+    // ID 값들이 유효한 숫자인지 확인
+    if ((query.id && isNaN(query.id)) || (query.store_id && isNaN(query.store_id))) {
+      throw new BadRequestException('유효하지 않은 ID 값입니다.');
+    }
+
     return this.storeProductRepository.findOne({
       where: query,
       relations: ['local_specialty'],
-      ...options,
     });
   }
 
@@ -52,6 +55,10 @@ export class StoreProductRepository {
   }
 
   async update(product_id: number, productData: Partial<StoreProduct>): Promise<void> {
+    if (!product_id || isNaN(product_id)) {
+      throw new BadRequestException('유효하지 않은 상품 ID입니다.');
+    }
+
     await this.storeProductRepository.update(product_id, productData);
   }
 

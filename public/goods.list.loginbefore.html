@@ -154,12 +154,14 @@
                         group.className = 'Group1';
 
                         // 필요한 속성에 안전하게 접근
+                        const productID = item.id || '아이디';
                         const productName = item.product_name || '이름 없음';
                         const productDescription = item.description || '설명 없음'; // description 사용
                         const productPrice = item.price !== undefined ? item.price : '가격 없음';
                         const productStock = item.stock !== undefined ? item.stock : '재고 정보 없음'; // stock 사용
 
                         group.innerHTML = `
+                    <div class="title title-id">아이디:${productID}</div>
                     <div class="title title-product_name">${productName}</div>
                     <div class="description title-description">${productDescription}</div>
                     <div class="title title-price">가격: ${productPrice} 원</div>

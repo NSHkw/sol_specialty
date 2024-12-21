@@ -6,7 +6,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { GetUser } from '../common/decorators/get-user.decorator';
 import { User } from '../user/entities/user.entity';
-import { ReviewResponse } from './types/review.type';
+import { ReviewDetailResponse, ReviewResponse } from './types/review.type';
 import { Review } from './entities/review.entity';
 
 @ApiTags('Review')
@@ -34,7 +34,7 @@ export class ReviewController {
 
   // 특정 id 상점의 리뷰 조회
   @Get(':store_id')
-  getReviews(@Param('store_id') store_id: number): Promise<Review[]> {
+  getReviews(@Param('store_id') store_id: number): Promise<ReviewDetailResponse> {
     return this.reviewService.getAllReviewsOfStore(store_id);
   }
 

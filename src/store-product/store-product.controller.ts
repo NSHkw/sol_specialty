@@ -9,6 +9,7 @@ import {
   UseGuards,
   HttpStatus,
   HttpCode,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { StoreProductService } from './store-product.service';
 import { CreateStoreProductDto } from './dto/create-store-product.dto';
@@ -69,8 +70,8 @@ export class StoreProductController {
   @HttpCode(HttpStatus.OK)
   async updateProductInfoInStore(
     @GetUser() user: User,
-    @Param('product_id') product_id: number,
-    @Param('store_id') store_id: number,
+    @Param('product_id', ParseIntPipe) product_id: number,
+    @Param('store_id', ParseIntPipe) store_id: number,
     @Body() updateStoreProductDto: UpdateStoreProductDto,
   ): Promise<StoreProductResponse<StoreProduct>> {
     return this.storeProductService.updateProductInfoInStore(

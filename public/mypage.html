@@ -165,6 +165,8 @@
         </div>
 
         <div class="info-container">
+            <div class="label">id</div>
+            <div class="info-box id"></div>
             <div class="label">이메일</div>
             <div class="info-box Emailbox"></div>
             <div class="label">닉네임</div>
@@ -212,6 +214,7 @@
                 const { data } = await response.json();
 
                 // HTML 요소에 데이터 출력
+                document.querySelector('.id').textContent = data.id || 'N/A';
                 document.querySelector('.Emailbox').textContent = data.email || 'N/A';
                 document.querySelector('.Nicknamebox').textContent = data.nickname || 'N/A';
                 document.querySelector('.Addressbox').textContent = data.address || 'N/A';

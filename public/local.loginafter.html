@@ -217,8 +217,8 @@
                         group.innerHTML = `
                             <a href="#" onclick="fetchSpecialtyDetail(${item.id}); return false;"> <!-- 상세 정보 페이지 링크 -->
                                 <img src="${item.image || 'https://via.placeholder.com/600x200'}" alt="${item.name}" />
+                                <div class="title title-id">id:${item.id}</div>
                                 <div class="title title-name">${item.name}</div>
-                                <div class="description title-description">${item.description}</div>
                                 <div class="title title-season1">${item.season_info.join(', ')}</div>
                                 <div class="title title-region">${item.region}</div>
                             </a>
