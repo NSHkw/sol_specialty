@@ -1,6 +1,5 @@
-// public.map.js
 class SpecialtyMap {
-  constructor(mapDiv, clientId) {
+  constructor(mapDiv) {
     this.map = null;
     this.infoWindow = null;
     this.specialtyMarkers = [];
@@ -119,59 +118,52 @@ class SpecialtyMap {
       },
     ];
 
-    this.loadNaverMapsScript(clientId).then(() => {
+    this.initializeMap(mapDiv);
+  }
+
+  async initializeMap(mapDiv) {
+    try {
+      const response = await fetch('/map-client-id');
+      if (!response.ok) {
+        throw new Error('Failed to fetch map client ID');
+      }
+
+      const { clientId } = await response.json();
+      if (!clientId) {
+        throw new Error('Map client ID is not available');
+      }
+
+      await this.loadNaverMapsScript(clientId);
+
       this.initMap(mapDiv);
       this.addMarkers();
-    });
 
-    const urlParams = new URLSearchParams(window.location.search);
-    this.selectedRegion = urlParams.get('region');
+      const urlParams = new URLSearchParams(window.location.search);
+      const selectedRegion = urlParams.get('region');
 
-    this.loadNaverMapsScript(clientId).then(() => {
-      this.initMap(mapDiv);
-      this.addMarkers();
-
-      // If a region was specified, zoom to it immediately
-      if (this.selectedRegion) {
-        const region = this.regions.find((r) => r.name === this.selectedRegion);
+      if (selectedRegion) {
+        const region = this.regions.find((r) => r.name === selectedRegion);
         if (region) {
           this.zoomToRegion(region);
           this.showSpecialties(region);
         }
       }
-    });
-  }
-
-  zoomToRegion(region) {
-    if (!this.map) return;
-
-    const position = new naver.maps.LatLng(region.lat, region.lng);
-    this.map.setCenter(position);
-    const zoomLevel = region.name === '제주도' ? 11 : 9;
-    this.map.setZoom(zoomLevel);
-  }
-
-  addMarkers() {
-    if (!this.map || !this.infoWindow) return;
-
-    this.regions.forEach((region) => {
-      const marker = new naver.maps.Marker({
-        position: new naver.maps.LatLng(region.lat, region.lng),
-        map: this.map,
-      });
-
-      naver.maps.Event.addListener(marker, 'click', () => {
-        this.zoomToRegion(region);
-        this.showSpecialties(region);
-      });
-    });
+    } catch (error) {
+      console.error('Error initializing map:', error);
+      const mapContainer = document.getElementById(mapDiv);
+      if (mapContainer) {
+        mapContainer.innerHTML =
+          '<div style="color: red; padding: 20px;">지도를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.</div>';
+      }
+    }
   }
 
   loadNaverMapsScript(clientId) {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const script = document.createElement('script');
       script.src = `https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;
-      script.onload = () => resolve();
+      script.onload = resolve;
+      script.onerror = () => reject(new Error('Failed to load Naver Maps script'));
       document.head.appendChild(script);
     });
   }
@@ -215,14 +207,19 @@ class SpecialtyMap {
       });
 
       naver.maps.Event.addListener(marker, 'click', () => {
-        if (this.map) {
-          this.map.setCenter(new naver.maps.LatLng(region.lat, region.lng));
-          const zoomLevel = region.name === '제주도' ? 11 : 9;
-          this.map.setZoom(zoomLevel);
-        }
+        this.zoomToRegion(region);
         this.showSpecialties(region);
       });
     });
+  }
+
+  zoomToRegion(region) {
+    if (!this.map) return;
+
+    const position = new naver.maps.LatLng(region.lat, region.lng);
+    this.map.setCenter(position);
+    const zoomLevel = region.name === '제주도' ? 11 : 9;
+    this.map.setZoom(zoomLevel);
   }
 
   showSpecialties(region) {
@@ -266,4 +263,4 @@ class SpecialtyMap {
   }
 }
 
-const specialtyMap = new SpecialtyMap('map-container', 'wkccyoua6i');
+const specialtyMap = new SpecialtyMap('map-container');
