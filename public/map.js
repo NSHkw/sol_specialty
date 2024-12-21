@@ -123,6 +123,48 @@ class SpecialtyMap {
       this.initMap(mapDiv);
       this.addMarkers();
     });
+
+    const urlParams = new URLSearchParams(window.location.search);
+    this.selectedRegion = urlParams.get('region');
+
+    this.loadNaverMapsScript(clientId).then(() => {
+      this.initMap(mapDiv);
+      this.addMarkers();
+
+      // If a region was specified, zoom to it immediately
+      if (this.selectedRegion) {
+        const region = this.regions.find((r) => r.name === this.selectedRegion);
+        if (region) {
+          this.zoomToRegion(region);
+          this.showSpecialties(region);
+        }
+      }
+    });
+  }
+
+  zoomToRegion(region) {
+    if (!this.map) return;
+
+    const position = new naver.maps.LatLng(region.lat, region.lng);
+    this.map.setCenter(position);
+    const zoomLevel = region.name === '제주도' ? 11 : 9;
+    this.map.setZoom(zoomLevel);
+  }
+
+  addMarkers() {
+    if (!this.map || !this.infoWindow) return;
+
+    this.regions.forEach((region) => {
+      const marker = new naver.maps.Marker({
+        position: new naver.maps.LatLng(region.lat, region.lng),
+        map: this.map,
+      });
+
+      naver.maps.Event.addListener(marker, 'click', () => {
+        this.zoomToRegion(region);
+        this.showSpecialties(region);
+      });
+    });
   }
 
   loadNaverMapsScript(clientId) {
