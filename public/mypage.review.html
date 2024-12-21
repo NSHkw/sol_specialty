@@ -197,11 +197,9 @@
             reviewsContainer.appendChild(storeName);
 
             const reviewCount = document.createElement('p');
-            reviewCount.textContent = `총 리뷰 개수: ${data.총_리뷰_개수}`;
             reviewsContainer.appendChild(reviewCount);
 
             const averageRating = document.createElement('p');
-            averageRating.textContent = `평균 리뷰 점수: ${data.평균_리뷰_점수}`;
             reviewsContainer.appendChild(averageRating);
 
             if (data.reviews.length > 0) {

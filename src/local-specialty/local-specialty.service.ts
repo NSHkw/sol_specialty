@@ -14,6 +14,7 @@ const SPECIALTY_SELECT_FIELDS = {
     name: true,
     season_info: true,
     region: true,
+    image:true
   },
   DETAIL: {
     id: true,
@@ -21,6 +22,7 @@ const SPECIALTY_SELECT_FIELDS = {
     description: true,
     season_info: true,
     region: true,
+    image:true
   },
 } as const;
 
