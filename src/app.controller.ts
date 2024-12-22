@@ -3,11 +3,15 @@ import { AppService } from './app.service';
 import { Response } from 'express';
 import { join } from 'path';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 @ApiTags('default')
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor(
+    private readonly appService: AppService,
+    private configService: ConfigService,
+  ) {}
 
   @Get()
   @ApiOperation({
@@ -22,5 +26,12 @@ export class AppController {
   @Get('specialties')
   getSpecialtiesMap(@Res() res: Response) {
     return res.sendFile(join(__dirname, '..', 'public', 'korea.html'));
+  }
+
+  @Get('map-client-id')
+  getMapClientId() {
+    return {
+      clientId: this.configService.get<string>('NAVER_MAPS_CLIENT_ID'),
+    };
   }
 }

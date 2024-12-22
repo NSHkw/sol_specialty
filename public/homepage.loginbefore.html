@@ -255,6 +255,8 @@
             mapColor: '#3498db',
             icon: '🏢',
             description: '대한민국의 수도권 중심지입니다.',
+            lat: 37.7142,
+            lng: 127.0292,
           },
           {
             name: 'Gangwon',
@@ -263,6 +265,8 @@
             mapColor: '#e74c3c',
             icon: '⛰️',
             description: '아름다운 산과 바다가 있는 관광의 중심지입니다.',
+            lat: 37.8613,
+            lng: 128.3115,
           },
           {
             name: 'North Chungcheong',
@@ -271,6 +275,8 @@
             mapColor: '#f1c40f',
             icon: '⛰️',
             description: '내륙 중심의 교통과 물류의 요충지입니다.',
+            lat: 36.8853,
+            lng: 127.7298,
           },
           {
             name: 'South Chungcheong',
@@ -279,6 +285,8 @@
             mapColor: '#27ae60',
             icon: '🌊',
             description: '서해안의 수산업과 농업이 발달한 지역입니다.',
+            lat: 36.5184,
+            lng: 126.8,
           },
           {
             name: 'North Jeolla',
@@ -287,6 +295,8 @@
             mapColor: '#9b59b6',
             icon: '🍚',
             description: '한국 전통 음식의 본고장입니다.',
+            lat: 35.7175,
+            lng: 127.153,
           },
           {
             name: 'South Jeolla',
@@ -295,6 +305,8 @@
             mapColor: '#e67e22',
             icon: '🌾',
             description: '비옥한 평야와 청정 해역을 보유한 지역입니다.',
+            lat: 34.8679,
+            lng: 126.991,
           },
           {
             name: 'North Gyeongsang',
@@ -303,6 +315,8 @@
             mapColor: '#1abc9c',
             icon: '⛰️',
             description: '한국의 전통문화와 역사가 살아있는 곳입니다.',
+            lat: 36.2893,
+            lng: 128.8922,
           },
           {
             name: 'South Gyeongsang',
@@ -311,6 +325,8 @@
             mapColor: '#d35400',
             icon: '🏠',
             description: '항만 물류와 해양 관광의 중심지입니다.',
+            lat: 35.4606,
+            lng: 128.2132,
           },
           {
             name: 'Jeju',
@@ -319,6 +335,8 @@
             mapColor: '#95a5a6',
             icon: '🌴',
             description: '아름다운 자연과 독특한 문화가 있는 관광의 섬입니다.',
+            lat: 33.3846,
+            lng: 126.5534,
           },
         ];
 
@@ -391,14 +409,26 @@
           `;
         }
 
+        document.querySelectorAll('.region-item').forEach((item) => {
+          item.addEventListener('click', () => {
+            const regionName = item.dataset.region;
+            const region = regions.find((r) => r.name === regionName);
+            if (region) {
+              window.location.href = `index.html?region=${encodeURIComponent(region.korName)}`;
+            }
+          });
+        });
+
         // UI 업데이트
         async function updateUI() {
           try {
             // 특산품 데이터 가져오기
             const specialties = await fetchSpecialtyData();
+            console.log('Fetched specialties:', specialties);
 
             // 지역별 특산품 개수 계산
             const regionCounts = calculateRegionCounts(specialties);
+            console.log('Region counts:', regionCounts);
 
             // 리스트 초기화
             leftList.innerHTML = '';
@@ -439,6 +469,10 @@
                 path.style.fill = region.mapColor;
                 path.style.stroke = '#FFFFFF';
                 path.style.strokeWidth = '1';
+
+                path.addEventListener('click', () => {
+                  window.location.href = `index.html?region=${encodeURIComponent(region.korName)}`;
+                });
 
                 path.addEventListener('mouseover', () => {
                   path.style.opacity = '0.7';
